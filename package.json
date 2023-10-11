@@ -26,7 +26,7 @@
 		"hardhat-celo": "^0.0.4"
 	},
 	"devDependencies": {
-		"@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@0.3.0-beta.12",
+		"@nomiclabs/hardhat-ethers": "^2.2.3",
 		"@nomiclabs/hardhat-etherscan": "^3.0.0",
 		"@nomiclabs/hardhat-waffle": "^2.0.2",
 		"@openzeppelin/contracts": "^4.9.0",
@@ -41,11 +41,11 @@
 		"cross-env": "^7.0.2",
 		"dotenv": "^10.0.0",
 		"ethereum-waffle": "^3.4.0",
-		"ethers": "^5.5.3",
+		"ethers": "^6.8.0",
 		"fs": "^0.0.1-security",
 		"fs-extra": "^10.0.0",
 		"ganache-cli": "^6.12.2",
-		"hardhat": "^2.8.3",
+		"hardhat": "^2.18.1",
 		"hardhat-deploy": "^0.10.4",
 		"hardhat-gas-reporter": "^1.0.7",
 		"prettier": "^2.5.1",

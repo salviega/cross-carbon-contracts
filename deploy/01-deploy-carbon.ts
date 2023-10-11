@@ -1,7 +1,11 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
-import { DeployFunction } from 'hardhat-deploy/types'
+import { DeployFunction, DeployResult } from 'hardhat-deploy/types'
 import { developmentChains, networkConfig } from '../helper-hardhat-config'
 import verify from '../helper-functions'
+import { ethers } from 'hardhat'
+import { Contract } from 'ethers'
+import { Carbon } from '../typechain-types/Carbon'
+import CarbonContractJson from '../artifacts/contracts/Carbon.sol/Carbon.json'
 
 const deployCarbon: DeployFunction = async function (
 	hre: HardhatRuntimeEnvironment
@@ -14,25 +18,51 @@ const deployCarbon: DeployFunction = async function (
 	log('----------------------------------------------------')
 	log('Deploying Carbon contract and waiting for confirmations...')
 
-	const args: any[] = [
-		'0x996b39698CF96A70B7a7005B5d1924a66C5E8f0e', // TCO2Faucet
-		'0xa5831eb637dff307395b5183c86B04c69C518681', // TCO2Token
-		'Carbon',
-		'CARBON'
+	const certificateArgs: string[] = [
+		'Certificate', //_name
+		'CERT', // _symbol
+		'https://api.carbon.fyi/certificate/' // _baseURI
 	]
 
-	const CarbonContract = await deploy('Carbon', {
+	const args: any[] = [
+		'0x996b39698CF96A70B7a7005B5d1924a66C5E8f0e', // _TCO2Faucet
+		'0xa5831eb637dff307395b5183c86B04c69C518681', // _TCO2Token
+		'0x050Ca75E3957c37dDF26D58046d8F9967B88190c', // _EPNS_COMM_ADDRESS
+		'Carbon', //_name
+		'CARBON', // _symbol
+		certificateArgs // _certificateArgs
+	]
+
+	const CarbonContract: DeployResult = await deploy('Carbon', {
 		from: deployer,
 		args: args,
 		log: true,
 		waitConfirmations: networkConfig[network.name].blockConfirmations || 1
 	})
+
 	if (
 		!developmentChains.includes(network.name) &&
 		(process.env.CELOSCAN_API_KEY || process.env.POLYGONSCAN_API_KEY)
 	) {
 		await verify(CarbonContract.address, args)
 	}
+
+	const carbonContract: Contract = await ethers.getContractAt(
+		'Carbon',
+		CarbonContract.address
+	)
+
+	log('----------------------------------------------------')
+	log('Setting up the certificate owner...')
+
+	const certificateAddress: string =
+		await carbonContract.CARBON_CERTIFICATE_ADDRESS()
+
+	const transferOwnershipTx = await carbonContract.transferOwnership(
+		certificateAddress
+	)
+
+	await transferOwnershipTx.wait(1)
 }
 
 export default deployCarbon
