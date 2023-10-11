@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
+import './Certificate.sol';
+
+import './enums/enums.sol';
+
+import './interfaces/ICertificate.sol';
+import './interfaces/IPUSHCommInterface.sol';
 import './interfaces/ITCO2Faucet.sol';
 import './interfaces/ITCO2Token.sol';
-import './interfaces/IPUSHCommInterface.sol';
 
 import './helpers/helpers.sol';
 
@@ -17,6 +21,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	ITCO2Token public TCO2TokenExtense;
 
 	address public EPNS_COMM_ADDRESS;
+	address public CARBON_CERTIFICATE_ADDRESS;
 
 	uint256 public TCO2FaucetTokensInContract;
 	uint256 public carbonTokensMinted;
@@ -26,11 +31,25 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address _TCO2Token,
 		address _EPNS_COMM_ADDRESS,
 		string memory _name,
-		string memory _symbol
+		string memory _symbol,
+		string[] memory _certificateArgs
 	) ERC20(_name, _symbol) Ownable() {
+		require(
+			_certificateArgs.length == 3,
+			'_certificateArgs should be of length 3'
+		);
+
 		TCO2FaucetExtense = ITCO2Faucet(_TCO2Faucet);
 		TCO2TokenExtense = ITCO2Token(_TCO2Token);
 		EPNS_COMM_ADDRESS = _EPNS_COMM_ADDRESS;
+
+		Certificate certificate = new Certificate(
+			_certificateArgs[uint(certificateArgs.name)],
+			_certificateArgs[uint(certificateArgs.symbol)],
+			_certificateArgs[uint(certificateArgs.baseURI)]
+		);
+
+		CARBON_CERTIFICATE_ADDRESS = address(certificate);
 	}
 
 	function buyCarbonCredits(address _buyer, uint256 _amount) public onlyOwner {
@@ -48,12 +67,9 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		carbonTokensMinted += _amount;
 	}
 
-	function burnCarbonCredits(uint256 _amount) public {
+	function burnCarbonCredits(address _buyer, uint256 _amount) public onlyOwner {
 		require(_amount > 0, 'Amount should be greater than 0');
-		require(_amount <= balanceOf(msg.sender), 'Insufficient CARBON tokens');
-
-		carbonTokensMinted -= _amount;
-		burn(_amount);
+		require(_amount <= balanceOf(_buyer), 'Insufficient CARBON tokens');
 
 		if (TCO2FaucetTokensInContract >= _amount) {
 			TCO2TokenExtense.retire(_amount);
@@ -64,6 +80,11 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			TCO2TokenExtense.retire(_amount);
 			TCO2FaucetTokensInContract = 0;
 		}
+
+		carbonTokensMinted -= _amount;
+		burn(_amount);
+
+		ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(_buyer);
 	}
 
 	// TODO: Offset carbon footprint
