@@ -1,6 +1,6 @@
-# Green Carbon Calculator - contracts
+# Cross Carbon - contracts
 
-Green Carbon Calculator: decentralized calculator
+Cross Carbon: interoperability carbon offset dApp
 
 ## Quick start 🏄
 
