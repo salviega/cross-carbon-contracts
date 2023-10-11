@@ -19,11 +19,13 @@ contract Certificate is ERC721, Ownable {
 		baseURI = _baseURI;
 	}
 
-	function safeMint(address to) public onlyOwner {
+	function safeMint(address to) public onlyOwner returns (uint256) {
 		uint256 tokenId = tokenIdCounter.current();
 		tokenIdCounter.increment();
 
 		_safeMint(to, tokenId);
+
+		return tokenId;
 	}
 
 	function approve(address, uint256) public pure override {

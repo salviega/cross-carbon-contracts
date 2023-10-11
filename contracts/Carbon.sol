@@ -8,12 +8,10 @@ import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
 import './Certificate.sol';
 
 import './enums/enums.sol';
-
 import './interfaces/ICertificate.sol';
 import './interfaces/IPUSHCommInterface.sol';
 import './interfaces/ITCO2Faucet.sol';
 import './interfaces/ITCO2Token.sol';
-
 import './helpers/helpers.sol';
 
 contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
@@ -25,6 +23,13 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 	uint256 public TCO2FaucetTokensInContract;
 	uint256 public carbonTokensMinted;
+
+	event BougthCarbonCredits(address indexed buyer, uint256 amount);
+	event OffsetCarbonFootprint(
+		address indexed buyer,
+		uint256 amount,
+		uint256 certificateId
+	);
 
 	constructor(
 		address _TCO2Faucet,
@@ -65,9 +70,14 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 		_mint(_buyer, _amount);
 		carbonTokensMinted += _amount;
+
+		emit BougthCarbonCredits(_buyer, _amount);
 	}
 
-	function burnCarbonCredits(address _buyer, uint256 _amount) public onlyOwner {
+	function offsetCarbonFootprint(
+		address _buyer,
+		uint256 _amount
+	) public onlyOwner {
 		require(_amount > 0, 'Amount should be greater than 0');
 		require(_amount <= balanceOf(_buyer), 'Insufficient CARBON tokens');
 
@@ -84,10 +94,14 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		carbonTokensMinted -= _amount;
 		burn(_amount);
 
-		ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(_buyer);
+		uint256 certificateId = ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(
+			_buyer
+		);
+
+		emit OffsetCarbonFootprint(_buyer, _amount, certificateId);
 	}
 
-	// TODO: Offset carbon footprint
+	// TODO: Calculate and Offset carbon footprint
 
 	function transfer(
 		address to,
