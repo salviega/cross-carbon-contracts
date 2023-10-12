@@ -25,7 +25,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	uint256 public carbonTokensMinted;
 
 	event BougthCarbonCredits(address indexed buyer, uint256 amount);
-	event OffsetCarbonFootprint(
+	event RetiredCarbonCredits(
 		address indexed buyer,
 		uint256 amount,
 		uint256 certificateId
@@ -74,7 +74,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		emit BougthCarbonCredits(_buyer, _amount);
 	}
 
-	function offsetCarbonFootprint(
+	function retireCarbonCredits(
 		address _buyer,
 		uint256 _amount
 	) public onlyOwner {
@@ -98,7 +98,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			_buyer
 		);
 
-		emit OffsetCarbonFootprint(_buyer, _amount, certificateId);
+		emit RetiredCarbonCredits(_buyer, _amount, certificateId);
 	}
 
 	// TODO: Calculate and Offset carbon footprint
