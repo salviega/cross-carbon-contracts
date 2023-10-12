@@ -103,6 +103,18 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 	// TODO: Calculate and Offset carbon footprint
 
+	function withdrawTCO2Tokens() public onlyOwner {
+		uint256 amount = TCO2TokenExtense.balanceOf(address(this));
+		require(TCO2TokenExtense.transfer(msg.sender, amount), 'Transfer failed');
+	}
+
+	function withdrawFunds() public onlyOwner {
+		(bool response /*bytes memory data*/, ) = msg.sender.call{
+			value: address(this).balance
+		}('');
+		require(response, 'Transfer failed');
+	}
+
 	function transfer(
 		address to,
 		uint256 amount
