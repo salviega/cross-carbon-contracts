@@ -165,7 +165,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 	) public onlyOwner returns (Travel memory carbonFootprintTravel) {
 		Calculator calculator = Calculator(CARBON_CALCULATOR_ADDRESS);
 
-		uint256 requestId;
+		bytes32 requestId;
 
 		requestId = calculator.sendRequest(
 			_source,
@@ -179,7 +179,14 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 			_jobId
 		);
 
-		Travel storage carbonFootprintTravel = calculator.travels[bytes32(requestId)];
+		(uint256 distance, uint256 nights, uint256 total) = calculator.travels(
+			requestId
+		);
+		Travel memory carbonFootprintTravel = Travel({
+			distance: distance,
+			nights: nights,
+			total: total
+		});
 
 		return carbonFootprintTravel;
 	}
