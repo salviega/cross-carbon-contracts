@@ -1,22 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
-import './Calculator.sol';
-import './Certificate.sol';
+import "./Calculator.sol";
+import "./Certificate.sol";
 
-import './enums/enums.sol';
-import './interfaces/ILinkToken.sol';
-import './interfaces/ICertificate.sol';
-import './interfaces/IPUSHCommInterface.sol';
-import './interfaces/ITCO2Faucet.sol';
-import './interfaces/ITCO2Token.sol';
-import './helpers/helpers.sol';
+import "./enums/enums.sol";
+import "./interfaces/ILinkToken.sol";
+import "./interfaces/ICertificate.sol";
+import "./interfaces/IPUSHCommInterface.sol";
+import "./interfaces/ITCO2Faucet.sol";
+import "./interfaces/ITCO2Token.sol";
 
 contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
+	using Strings for address;
+  using Strings for uint;
+
 	ITCO2Faucet public TCO2FaucetExtense;
 	ITCO2Token public TCO2TokenExtense;
 
@@ -27,6 +30,8 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 	uint256 public TCO2FaucetTokensInContract;
 	uint256 public carbonTokensMinted;
+
+	
 
 	event BougthCarbonCredits(address indexed buyer, uint256 amount);
 	event RetiredCarbonCredits(
@@ -42,15 +47,15 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address _LINK_TOKEN_ADDRESS,
 		string[] memory _certificateArgs,
 		address[] memory _calculatorArgs
-	) ERC20('carbon', 'CARBON') Ownable(msg.sender) {
+	) ERC20("carbon", "CARBON") Ownable(msg.sender) {
 		require(
 			_certificateArgs.length == 3,
-			'_certificateArgs should be of length 3'
+			"_certificateArgs should be of length 3"
 		);
 
 		require(
 			_calculatorArgs.length == 1,
-			'_calculatorArgs should be of length 1'
+			"_calculatorArgs should be of length 1"
 		);
 
 		TCO2FaucetExtense = ITCO2Faucet(_TCO2Faucet);
@@ -81,7 +86,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	receive() external payable {}
 
 	function buyCarbonCredits(address _buyer, uint256 _amount) public onlyOwner {
-		require(_amount > 0, 'Amount should be greater than 0');
+		require(_amount > 0, "Amount should be greater than 0");
 
 		uint256 totalCarbonAfterMint = carbonTokensMinted + _amount;
 		if (TCO2FaucetTokensInContract < totalCarbonAfterMint) {
@@ -101,8 +106,8 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address _buyer,
 		uint256 _amount
 	) public onlyOwner {
-		require(_amount > 0, 'Amount should be greater than 0');
-		require(_amount <= balanceOf(_buyer), 'Insufficient CARBON tokens');
+		require(_amount > 0, "Amount should be greater than 0");
+		require(_amount <= balanceOf(_buyer), "Insufficient CARBON tokens");
 
 		if (TCO2FaucetTokensInContract >= _amount) {
 			TCO2TokenExtense.retire(_amount);
@@ -119,10 +124,28 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 		uint256 certificateId = ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(
 			_buyer,
-			_amount,
-			EPNS_COMM_ADDRESS
+			_amount
 		);
-
+		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
+			0xaA7880DB88D8e051428b5204817e58D8327340De, // from channel
+			to,
+			bytes(
+				string(
+					abi.encodePacked(
+						"0",
+						"+",
+						"3",
+						"+",
+						"Congrats!",
+						"+",
+						owner.toHexString(),
+						" transferred ",
+						(amount / (10 ** uint(decimals()))).toString(),
+						" CARBON to you!"
+					)
+				)
+			)
+		);
 		emit RetiredCarbonCredits(_buyer, _amount, certificateId);
 	}
 
@@ -156,14 +179,14 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 	function withdrawTCO2Tokens() public onlyOwner {
 		uint256 amount = TCO2TokenExtense.balanceOf(address(this));
-		require(TCO2TokenExtense.transfer(msg.sender, amount), 'Transfer failed');
+		require(TCO2TokenExtense.transfer(msg.sender, amount), "Transfer failed");
 	}
 
 	function withdrawFunds() public onlyOwner {
 		(bool response /*bytes memory data*/, ) = msg.sender.call{
 			value: address(this).balance
-		}('');
-		require(response, 'Transfer failed');
+		}("");
+		require(response, "Transfer failed");
 	}
 
 	function transfer(
@@ -179,16 +202,16 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			bytes(
 				string(
 					abi.encodePacked(
-						'0',
-						'+',
-						'3',
-						'+',
-						'Congrats!',
-						'+',
-						addressToString(owner),
-						' transferred ',
-						uint2str(amount / (10 ** uint(decimals()))),
-						' CARBON to you!'
+						"0",
+						"+",
+						"3",
+						"+",
+						"Congrats!",
+						"+",
+						owner.toHexString(),
+						" transferred ",
+						(amount / (10 ** uint(decimals()))).toString(),
+						" CARBON to you!"
 					)
 				)
 			)
@@ -212,16 +235,16 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			bytes(
 				string(
 					abi.encodePacked(
-						'0',
-						'+',
-						'3',
-						'+',
-						'Congrats!',
-						'+',
-						addressToString(spender),
-						' transferred ',
-						uint2str(amount / (10 ** uint(decimals()))),
-						' CARBON to you!'
+						"0",
+						"+",
+						"3",
+						"+",
+						"Congrats!",
+						"+",
+						spender.toHexString(),
+						" transferred ",
+						(amount / (10 ** uint(decimals()))).toString(),
+						" CARBON to you!"
 					)
 				)
 			)
