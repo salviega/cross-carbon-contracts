@@ -116,7 +116,9 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		burn(_amount);
 
 		uint256 certificateId = ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(
-			_buyer
+			_buyer,
+			_amount,
+			EPNS_COMM_ADDRESS
 		);
 
 		emit RetiredCarbonCredits(_buyer, _amount, certificateId);
@@ -170,7 +172,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		_transfer(owner, to, amount);
 
 		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
-			0x050Ca75E3957c37dDF26D58046d8F9967B88190c, // from channel
+			0xaA7880DB88D8e051428b5204817e58D8327340De, // from channel
 			to,
 			bytes(
 				string(
@@ -179,11 +181,10 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 						'+',
 						'3',
 						'+',
-						'Tranfer Alert',
+						'Congrats!',
 						'+',
-						'Hooray! ',
-						addressToString(msg.sender),
-						' sent ',
+						addressToString(owner),
+						' transferred ',
 						uint2str(amount / (10 ** uint(decimals()))),
 						' CARBON to you!'
 					)
@@ -204,7 +205,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		_transfer(from, to, amount);
 
 		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
-			0x050Ca75E3957c37dDF26D58046d8F9967B88190c, // from channel
+			0xaA7880DB88D8e051428b5204817e58D8327340De,
 			to,
 			bytes(
 				string(
@@ -213,9 +214,9 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 						'+',
 						'3',
 						'+',
-						'Transfer Alert',
+						'Congrats!',
 						'+',
-						addressToString(from),
+						addressToString(spender),
 						' transferred ',
 						uint2str(amount / (10 ** uint(decimals()))),
 						' CARBON to you!'
