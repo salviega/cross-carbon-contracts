@@ -16,15 +16,11 @@ import './interfaces/IPUSHCommInterface.sol';
 import './interfaces/ITCO2Faucet.sol';
 import './interfaces/ITCO2Token.sol';
 
+import {Travel} from './constants/structs/structs.sol';
+
 contract Carbon is ERC20, ERC20Burnable, Ownable {
 	using Strings for address;
 	using Strings for uint;
-
-	struct Travel {
-		uint256 distance;
-		uint256 nights;
-		uint256 total;
-	}
 
 	ITCO2Faucet public TCO2FaucetExtense;
 	ITCO2Token public TCO2TokenExtense;
@@ -182,6 +178,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		(uint256 distance, uint256 nights, uint256 total) = calculator.travels(
 			requestId
 		);
+
 		Travel memory carbonFootprintTravel = Travel({
 			distance: distance,
 			nights: nights,

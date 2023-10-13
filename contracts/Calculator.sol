@@ -5,14 +5,10 @@ import {FunctionsClient} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_
 import {ConfirmedOwner} from '@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol';
 import {FunctionsRequest} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol';
 
+import {Travel} from './constants/structs/structs.sol';
+
 contract Calculator is FunctionsClient, ConfirmedOwner {
 	using FunctionsRequest for FunctionsRequest.Request;
-
-	struct Travel {
-		uint256 distance;
-		uint256 nights;
-		uint256 total;
-	}
 
 	bytes public s_lastError;
 	bytes public s_lastResponse;
@@ -98,7 +94,7 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 		bytes memory err
 	) internal override {
 		if (s_lastRequestId != requestId) {
-			revert UnexpectedRequestID(requestId);
+			revert('UnexpectedRequestID');
 		}
 
 		if (response.length > 0) {
@@ -106,13 +102,17 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 
 			uint256 factor = 10 ** 18;
 
-			uint256 _nights = carbonFootprint / (factor * factor);
-			uint256 _distance = (carbonFootprint / factor) % factor;
-			uint256 _total = carbonFootprint % factor;
+			uint256 _distance = carbonFootprint / (factor * factor);
+			carbonFootprint %= (factor * factor);
+
+			uint256 _nights = carbonFootprint / factor;
+			carbonFootprint %= factor;
+
+			uint256 _total = carbonFootprint;
 
 			travels[s_lastRequestId] = Travel({
-				distance: _nights,
-				nights: _distance,
+				distance: _distance,
+				nights: _nights,
 				total: _total
 			});
 		}
