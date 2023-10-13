@@ -78,6 +78,8 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		);
 	}
 
+	receive() external payable {}
+
 	function buyCarbonCredits(address _buyer, uint256 _amount) public onlyOwner {
 		require(_amount > 0, 'Amount should be greater than 0');
 
