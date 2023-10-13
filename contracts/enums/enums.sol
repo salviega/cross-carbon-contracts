@@ -6,3 +6,7 @@ enum certificateArgs {
 	symbol,
 	baseURI
 }
+
+enum calculatorArgs {
+	router
+}

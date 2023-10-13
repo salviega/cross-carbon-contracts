@@ -22,13 +22,16 @@ const deployCarbon: DeployFunction = async function (
 		'https://api.carbon.fyi/certificate/' // _baseURI
 	]
 
+	const calculatorArgs: string[] = [
+		'0x6E2dc0F9DB014aE19888F539E59285D2Ea04244C' // _router
+	]
+
 	const args: any[] = [
 		'0x996b39698CF96A70B7a7005B5d1924a66C5E8f0e', // _TCO2Faucet
 		'0xa5831eb637dff307395b5183c86B04c69C518681', // _TCO2Token
 		'0x050Ca75E3957c37dDF26D58046d8F9967B88190c', // _EPNS_COMM_ADDRESS
-		'Carbon', //_name
-		'CARBON', // _symbol
-		certificateArgs // _certificateArgs
+		certificateArgs, // _certificateArgs
+		calculatorArgs // _calculatorArgs
 	]
 
 	const CarbonContract: DeployResult = await deploy('Carbon', {
@@ -53,22 +56,34 @@ const deployCarbon: DeployFunction = async function (
 	log('----------------------------------------------------')
 	log('Setting up the certificate owner...')
 
-	const certificateAddress: string =
-		await carbonContract.CARBON_CERTIFICATE_ADDRESS()
-
 	const certificateContract: Contract = await ethers.getContractAt(
 		'Certificate',
 		deployer
 	)
 
-	const transferOwnershipTx = await certificateContract.transferOwnership(
-		CarbonContract.address
+	const transferCertificateOwnershipTx =
+		await certificateContract.transferOwnership(CarbonContract.address)
+
+	await transferCertificateOwnershipTx.wait(1)
+
+	log('Carbon contract is the new owner of the certificate contract.')
+	log('\n')
+
+	const calculatorContract: Contract = await ethers.getContractAt(
+		'Calculator',
+		deployer
 	)
 
-	await transferOwnershipTx.wait(1)
+	log('----------------------------------------------------')
+	log('Setting up the certificate owner...')
 
+	const transferCalculatorOwnershipTx =
+		await calculatorContract.transferOwnership(CarbonContract.address)
+
+	await transferCalculatorOwnershipTx.wait(1)
+
+	log('Carbon contract is the new owner of the calculator contract.')
 	log('\n')
-	log('Carbon contract is the new owner of the certificate contract.')
 }
 
 export default deployCarbon

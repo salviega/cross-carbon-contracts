@@ -5,6 +5,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
 
+import './Calculator.sol';
 import './Certificate.sol';
 
 import './enums/enums.sol';
@@ -20,6 +21,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 	address public EPNS_COMM_ADDRESS;
 	address public CARBON_CERTIFICATE_ADDRESS;
+	address public CARBON_CALCULATOR_ADDRESS;
 
 	uint256 public TCO2FaucetTokensInContract;
 	uint256 public carbonTokensMinted;
@@ -35,13 +37,17 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address _TCO2Faucet,
 		address _TCO2Token,
 		address _EPNS_COMM_ADDRESS,
-		string memory _name,
-		string memory _symbol,
-		string[] memory _certificateArgs
-	) ERC20(_name, _symbol) Ownable(msg.sender) {
+		string[] memory _certificateArgs,
+		address[] memory _calculatorArgs
+	) ERC20('carbon', 'CARBON') Ownable(msg.sender) {
 		require(
 			_certificateArgs.length == 3,
 			'_certificateArgs should be of length 3'
+		);
+
+		require(
+			_calculatorArgs.length == 1,
+			'_calculatorArgs should be of length 1'
 		);
 
 		TCO2FaucetExtense = ITCO2Faucet(_TCO2Faucet);
@@ -54,7 +60,12 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			_certificateArgs[uint(certificateArgs.baseURI)]
 		);
 
+		Calculator calculator = new Calculator(
+			_calculatorArgs[uint(calculatorArgs.router)]
+		);
+
 		CARBON_CERTIFICATE_ADDRESS = address(certificate);
+		CARBON_CALCULATOR_ADDRESS = address(calculator);
 	}
 
 	function buyCarbonCredits(address _buyer, uint256 _amount) public onlyOwner {
