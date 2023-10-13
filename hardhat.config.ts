@@ -11,12 +11,14 @@ import { CustomHardhatConfig } from './models/custom-hardhat-config.model'
 
 require('dotenv').config()
 
-const {
-	CELOSCAN_API_KEY,
-	COINMARKETCAP_API_KEY,
-	POLYGONSCAN_API_KEY,
-	PRIVATE_KEY
-} = process.env
+const { CELOSCAN_API_KEY, POLYGONSCAN_API_KEY, PRIVATE_KEY } = process.env
+
+const SOLC_SETTINGS = {
+	optimizer: {
+		enabled: true,
+		runs: 200
+	}
+}
 
 const defaultNetwork = 'mumbai' // change the defaul network if you want to deploy onchain
 const config: CustomHardhatConfig = {
@@ -68,14 +70,32 @@ const config: CustomHardhatConfig = {
 		}
 	},
 	solidity: {
-		version: '0.8.19',
-		settings: {
-			optimizer: {
-				enabled: true,
-				runs: 200,
-				details: { yul: false }
+		compilers: [
+			{
+				version: '0.8.20',
+				settings: SOLC_SETTINGS
+			},
+			{
+				version: '0.8.19',
+				settings: SOLC_SETTINGS
+			},
+			{
+				version: '0.8.7',
+				settings: SOLC_SETTINGS
+			},
+			{
+				version: '0.7.0',
+				settings: SOLC_SETTINGS
+			},
+			{
+				version: '0.6.6',
+				settings: SOLC_SETTINGS
+			},
+			{
+				version: '0.4.24',
+				settings: SOLC_SETTINGS
 			}
-		}
+		]
 	},
 	mocha: {
 		timeout: 200000

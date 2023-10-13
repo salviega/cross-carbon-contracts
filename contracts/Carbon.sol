@@ -38,7 +38,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		string memory _name,
 		string memory _symbol,
 		string[] memory _certificateArgs
-	) ERC20(_name, _symbol) Ownable() {
+	) ERC20(_name, _symbol) Ownable(msg.sender) {
 		require(
 			_certificateArgs.length == 3,
 			'_certificateArgs should be of length 3'

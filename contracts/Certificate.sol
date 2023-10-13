@@ -3,25 +3,22 @@ pragma solidity ^0.8.19;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
-import '@openzeppelin/contracts/utils/Counters.sol';
 
 contract Certificate is ERC721, Ownable {
-	using Counters for Counters.Counter;
-
-	Counters.Counter public tokenIdCounter;
+	uint256 public tokenIdCounter;
 	string baseURI;
 
 	constructor(
 		string memory _name,
 		string memory _symbol,
 		string memory _baseURI
-	) ERC721(_name, _symbol) Ownable() {
+	) ERC721(_name, _symbol) Ownable(msg.sender) {
 		baseURI = _baseURI;
 	}
 
 	function safeMint(address to) public onlyOwner returns (uint256) {
-		uint256 tokenId = tokenIdCounter.current();
-		tokenIdCounter.increment();
+		uint256 tokenId = tokenIdCounter;
+		tokenIdCounter++;
 
 		_safeMint(to, tokenId);
 
@@ -52,7 +49,7 @@ contract Certificate is ERC721, Ownable {
 	function tokenURI(
 		uint256 tokenId
 	) public view override returns (string memory) {
-		_requireMinted(tokenId);
+		_requireOwned(tokenId);
 
 		return baseURI;
 	}
