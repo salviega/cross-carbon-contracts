@@ -8,10 +8,17 @@ import {FunctionsRequest} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0
 contract Calculator is FunctionsClient, ConfirmedOwner {
 	using FunctionsRequest for FunctionsRequest.Request;
 
+	struct Travel {
+		uint256 distance;
+		uint256 nights;
+		uint256 total;
+	}
+
 	bytes public s_lastError;
 	bytes public s_lastResponse;
-	string public s_lastResponseString;
 	bytes32 public s_lastRequestId;
+
+	mapping(bytes32 => Travel) public travels;
 
 	error UnexpectedRequestID(bytes32 requestId);
 
@@ -93,8 +100,24 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 		if (s_lastRequestId != requestId) {
 			revert UnexpectedRequestID(requestId);
 		}
+
+		if (response.length > 0) {
+			uint256 carbonFootprint = abi.decode(response, (uint256));
+
+			uint256 factor = 10 ** 18;
+
+			uint256 _nights = carbonFootprint / (factor * factor);
+			uint256 _distance = (carbonFootprint / factor) % factor;
+			uint256 _total = carbonFootprint % factor;
+
+			travels[s_lastRequestId] = Travel({
+				distance: _nights,
+				nights: _distance,
+				total: _total
+			});
+		}
+
 		s_lastResponse = response;
-		s_lastResponseString = string(response);
 		s_lastError = err;
 		emit Response(requestId, s_lastResponse, s_lastError);
 	}
