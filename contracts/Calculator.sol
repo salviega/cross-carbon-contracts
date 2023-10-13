@@ -41,7 +41,7 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 		uint64 subscriptionId,
 		uint32 gasLimit,
 		bytes32 jobId
-	) external onlyOwner returns (bytes32 requestId) {
+	) external returns (bytes32 requestId) {
 		FunctionsRequest.Request memory req;
 		req.initializeRequestForInlineJavaScript(source);
 		if (encryptedSecretsUrls.length > 0)

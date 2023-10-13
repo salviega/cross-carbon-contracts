@@ -125,12 +125,12 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	// TODO: Calculate and Offset carbon footprint
 
 	function calculateTravelFootprint(
-		string calldata _source,
-		bytes calldata _encryptedSecretsUrls,
+		string memory _source,
+		bytes memory _encryptedSecretsUrls,
 		uint8 _donHostedSecretsSlotID,
 		uint64 _donHostedSecretsVersion,
-		string[] calldata _args,
-		bytes[] calldata _bytesArgs,
+		string[] memory _args,
+		bytes[] memory _bytesArgs,
 		uint64 _subscriptionId,
 		uint32 _gasLimit,
 		bytes32 _jobId
