@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 
-contract Certificate is ERC721, Ownable, Helpers {
+contract Certificate is ERC721, Ownable {
 	uint256 public tokenIdCounter;
 	string baseURI;
 
