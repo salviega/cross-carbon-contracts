@@ -17,7 +17,8 @@ const SOLC_SETTINGS = {
 	optimizer: {
 		enabled: true,
 		runs: 200
-	}
+	},
+	viaIR: true
 }
 
 const defaultNetwork = 'mumbai' // change the defaul network if you want to deploy onchain

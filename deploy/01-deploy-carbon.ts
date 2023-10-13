@@ -30,6 +30,7 @@ const deployCarbon: DeployFunction = async function (
 		'0x996b39698CF96A70B7a7005B5d1924a66C5E8f0e', // _TCO2Faucet
 		'0xa5831eb637dff307395b5183c86B04c69C518681', // _TCO2Token
 		'0x050Ca75E3957c37dDF26D58046d8F9967B88190c', // _EPNS_COMM_ADDRESS
+		'0x326C977E6efc84E512bB9C30f76E30c160eD06FB', // _LINK_TOKEN_ADDRESS
 		certificateArgs, // _certificateArgs
 		calculatorArgs // _calculatorArgs
 	]

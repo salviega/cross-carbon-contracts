@@ -9,6 +9,7 @@ import './Calculator.sol';
 import './Certificate.sol';
 
 import './enums/enums.sol';
+import './interfaces/ILinkToken.sol';
 import './interfaces/ICertificate.sol';
 import './interfaces/IPUSHCommInterface.sol';
 import './interfaces/ITCO2Faucet.sol';
@@ -20,6 +21,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	ITCO2Token public TCO2TokenExtense;
 
 	address public EPNS_COMM_ADDRESS;
+	address public LINK_TOKEN_ADDRESS;
 	address public CARBON_CERTIFICATE_ADDRESS;
 	address public CARBON_CALCULATOR_ADDRESS;
 
@@ -37,6 +39,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address _TCO2Faucet,
 		address _TCO2Token,
 		address _EPNS_COMM_ADDRESS,
+		address _LINK_TOKEN_ADDRESS,
 		string[] memory _certificateArgs,
 		address[] memory _calculatorArgs
 	) ERC20('carbon', 'CARBON') Ownable(msg.sender) {
@@ -52,7 +55,9 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 		TCO2FaucetExtense = ITCO2Faucet(_TCO2Faucet);
 		TCO2TokenExtense = ITCO2Token(_TCO2Token);
+
 		EPNS_COMM_ADDRESS = _EPNS_COMM_ADDRESS;
+		LINK_TOKEN_ADDRESS = _LINK_TOKEN_ADDRESS;
 
 		Certificate certificate = new Certificate(
 			_certificateArgs[uint(certificateArgs.name)],
@@ -66,6 +71,11 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 		CARBON_CERTIFICATE_ADDRESS = address(certificate);
 		CARBON_CALCULATOR_ADDRESS = address(calculator);
+
+		ILinkTokenInterface(_LINK_TOKEN_ADDRESS).approve(
+			address(calculator),
+			type(uint256).max
+		);
 	}
 
 	function buyCarbonCredits(address _buyer, uint256 _amount) public onlyOwner {
@@ -113,6 +123,32 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	}
 
 	// TODO: Calculate and Offset carbon footprint
+
+	function calculateTravelFootprint(
+		string calldata _source,
+		bytes calldata _encryptedSecretsUrls,
+		uint8 _donHostedSecretsSlotID,
+		uint64 _donHostedSecretsVersion,
+		string[] calldata _args,
+		bytes[] calldata _bytesArgs,
+		uint64 _subscriptionId,
+		uint32 _gasLimit,
+		bytes32 _jobId
+	) public onlyOwner {
+		Calculator calculator = Calculator(CARBON_CALCULATOR_ADDRESS);
+
+		calculator.sendRequest(
+			_source,
+			_encryptedSecretsUrls,
+			_donHostedSecretsSlotID,
+			_donHostedSecretsVersion,
+			_args,
+			_bytesArgs,
+			_subscriptionId,
+			_gasLimit,
+			_jobId
+		);
+	}
 
 	function withdrawTCO2Tokens() public onlyOwner {
 		uint256 amount = TCO2TokenExtense.balanceOf(address(this));
