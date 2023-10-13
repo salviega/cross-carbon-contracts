@@ -17,6 +17,12 @@ import './interfaces/ITCO2Token.sol';
 import './helpers/helpers.sol';
 
 contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
+	struct Travel {
+		uint256 distance;
+		uint256 nights;
+		uint256 total;
+	}
+
 	ITCO2Faucet public TCO2FaucetExtense;
 	ITCO2Token public TCO2TokenExtense;
 
@@ -25,7 +31,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	address public CARBON_CERTIFICATE_ADDRESS;
 	address public CARBON_CALCULATOR_ADDRESS;
 
-	uint256 public TCO2FaucetTokensInContract;
+	uint256 public TCO2TokensInContract;
 	uint256 public carbonTokensMinted;
 
 	event BougthCarbonCredits(address indexed buyer, uint256 amount);
@@ -84,11 +90,10 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		require(_amount > 0, 'Amount should be greater than 0');
 
 		uint256 totalCarbonAfterMint = carbonTokensMinted + _amount;
-		if (TCO2FaucetTokensInContract < totalCarbonAfterMint) {
-			uint256 amountToWithdraw = totalCarbonAfterMint -
-				TCO2FaucetTokensInContract;
+		if (TCO2TokensInContract < totalCarbonAfterMint) {
+			uint256 amountToWithdraw = totalCarbonAfterMint - TCO2TokensInContract;
 			TCO2FaucetExtense.withdraw(address(TCO2TokenExtense), amountToWithdraw);
-			TCO2FaucetTokensInContract += amountToWithdraw;
+			TCO2TokensInContract += amountToWithdraw;
 		}
 
 		_mint(_buyer, _amount);
@@ -104,14 +109,14 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		require(_amount > 0, 'Amount should be greater than 0');
 		require(_amount <= balanceOf(_buyer), 'Insufficient CARBON tokens');
 
-		if (TCO2FaucetTokensInContract >= _amount) {
+		if (TCO2TokensInContract >= _amount) {
 			TCO2TokenExtense.retire(_amount);
-			TCO2FaucetTokensInContract -= _amount;
+			TCO2TokensInContract -= _amount;
 		} else {
-			uint256 amountFromOwner = _amount - TCO2FaucetTokensInContract;
+			uint256 amountFromOwner = _amount - TCO2TokensInContract;
 			TCO2FaucetExtense.withdraw(address(TCO2TokenExtense), amountFromOwner);
 			TCO2TokenExtense.retire(_amount);
-			TCO2FaucetTokensInContract = 0;
+			TCO2TokensInContract = 0;
 		}
 
 		carbonTokensMinted -= _amount;
@@ -138,10 +143,12 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		uint64 _subscriptionId,
 		uint32 _gasLimit,
 		bytes32 _jobId
-	) public onlyOwner {
+	) public onlyOwner returns (Travel memory carbonFootprintTravel) {
 		Calculator calculator = Calculator(CARBON_CALCULATOR_ADDRESS);
 
-		calculator.sendRequest(
+		uint256 requestId;
+
+		requestId = calculator.sendRequest(
 			_source,
 			_encryptedSecretsUrls,
 			_donHostedSecretsSlotID,
@@ -152,6 +159,10 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			_gasLimit,
 			_jobId
 		);
+
+		Travel carbonFootprintTravel = calculator.travels[requestId];
+
+		return carbonFootprintTravel;
 	}
 
 	function withdrawTCO2Tokens() public onlyOwner {
