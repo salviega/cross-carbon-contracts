@@ -122,8 +122,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		burn(_amount);
 
 		uint256 certificateId = ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(
-			_buyer,
-			_amount
+			_buyer
 		);
 		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
 			0xaA7880DB88D8e051428b5204817e58D8327340De, // from channel
@@ -179,7 +178,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 			requestId
 		);
 
-		Travel memory carbonFootprintTravel = Travel({
+		carbonFootprintTravel = Travel({
 			distance: distance,
 			nights: nights,
 			total: total
