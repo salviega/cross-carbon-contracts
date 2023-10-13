@@ -4,8 +4,6 @@ import { developmentChains, networkConfig } from '../helper-hardhat-config'
 import verify from '../helper-functions'
 import { ethers } from 'hardhat'
 import { Contract } from 'ethers'
-import { Carbon } from '../typechain-types/Carbon'
-import CarbonContractJson from '../artifacts/contracts/Carbon.sol/Carbon.json'
 
 const deployCarbon: DeployFunction = async function (
 	hre: HardhatRuntimeEnvironment
@@ -58,11 +56,19 @@ const deployCarbon: DeployFunction = async function (
 	const certificateAddress: string =
 		await carbonContract.CARBON_CERTIFICATE_ADDRESS()
 
-	const transferOwnershipTx = await carbonContract.transferOwnership(
-		certificateAddress
+	const certificateContract: Contract = await ethers.getContractAt(
+		'Certificate',
+		deployer
+	)
+
+	const transferOwnershipTx = await certificateContract.transferOwnership(
+		CarbonContract.address
 	)
 
 	await transferOwnershipTx.wait(1)
+
+	log('\n')
+	log('Carbon contract is the new owner of the certificate contract.')
 }
 
 export default deployCarbon
