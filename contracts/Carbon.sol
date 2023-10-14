@@ -34,6 +34,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 	uint256 public carbonTokensMinted;
 
 	event BougthCarbonCredits(address indexed buyer, uint256 amount);
+
 	event RetiredCarbonCredits(
 		address indexed buyer,
 		uint256 amount,
@@ -42,8 +43,10 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 
 	event CarbonFootprintOffset(
 		address indexed buyer,
-		uint256 amount,
-		uint256 certificateId
+		string[] args,
+		uint256 distance,
+		uint256 nights,
+		uint256 total
 	);
 
 	constructor(
@@ -104,6 +107,26 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		_mint(_buyer, _amount);
 		carbonTokensMinted += _amount;
 
+		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
+			0xaA7880DB88D8e051428b5204817e58D8327340De, // from channel
+			_buyer,
+			bytes(
+				string(
+					abi.encodePacked(
+						'0',
+						'+',
+						'3',
+						'+',
+						'Congrats!',
+						'+',
+						'You just bought ',
+						(_amount / (10 ** uint(decimals()))).toString(),
+						' CARBON!'
+					)
+				)
+			)
+		);
+
 		emit BougthCarbonCredits(_buyer, _amount);
 	}
 
@@ -130,6 +153,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		uint256 certificateId = ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(
 			_buyer
 		);
+
 		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
 			0xaA7880DB88D8e051428b5204817e58D8327340De, // from channel
 			_buyer,
@@ -148,6 +172,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 				)
 			)
 		);
+
 		emit RetiredCarbonCredits(_buyer, _amount, certificateId);
 	}
 
@@ -193,7 +218,13 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		buyCarbonCredits(msg.sender, carbonFootprintTravel.total);
 		retireCarbonCredits(msg.sender, carbonFootprintTravel.total);
 
-		emit CarbonFootprintOffset(msg.sender, carbonFootprintTravel.total, 0);
+		emit CarbonFootprintOffset(
+			msg.sender,
+			_args,
+			carbonFootprintTravel.distance,
+			carbonFootprintTravel.nights,
+			carbonFootprintTravel.total
+		);
 	}
 
 	function withdrawTCO2Tokens() public onlyOwner {
