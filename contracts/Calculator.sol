@@ -109,12 +109,6 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 			carbonFootprint %= factor;
 
 			uint256 _total = carbonFootprint;
-
-			travels[s_lastRequestId] = Travel({
-				distance: _distance,
-				nights: _nights,
-				total: _total
-			});
 		}
 
 		s_lastResponse = response;

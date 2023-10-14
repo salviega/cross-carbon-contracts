@@ -16,7 +16,7 @@ import './interfaces/IPUSHCommInterface.sol';
 import './interfaces/ITCO2Faucet.sol';
 import './interfaces/ITCO2Token.sol';
 
-import {Travel} from './variables/structs/structs.sol';
+import {Grosery, Travel} from './variables/structs/structs.sol';
 
 contract Carbon is ERC20, ERC20Burnable, Ownable {
 	using Strings for address;
@@ -32,6 +32,9 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 
 	uint256 public TCO2TokensInContract;
 	uint256 public carbonTokensMinted;
+
+	mapping(bytes32 => Travel) public travelRequests;
+	mapping(bytes32 => Grosery) public groseryRequests;
 
 	event BougthCarbonCredits(address indexed buyer, uint256 amount);
 
@@ -201,57 +204,59 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 			keccak256(abi.encodePacked(_flag)) ==
 			keccak256(abi.encodePacked('travel'))
 		) {
-			string calldata distance = _args[uint(travelArgs.distance)];
-			string calldata nights = _args[uint(travelArgs.nights)];
+			Travel memory travel = Travel(
+				_args[uint(travelArgs.distance)],
+				_args[uint(travelArgs.nights)],
+				_returns[uint(travelReturns.flightEmission)],
+				_returns[uint(travelReturns.hotelEmission)],
+				_returns[uint(travelReturns.travelEmission)],
+				_buyer
+			);
 
-			uint256 flightEmission = _returns[uint(travelReturns.flightEmission)];
-			uint256 hotelEmission = _returns[uint(travelReturns.hotelEmission)];
-			uint256 travelEmission = _returns[uint(travelReturns.travelEmission)];
+			travelRequests[_requestId] = travel;
 
-			buyCarbonCredits(_buyer, travelEmission);
-			retireCarbonCredits(_buyer, travelEmission);
+			buyCarbonCredits(travel.buyer, travel.travelEmission);
+			retireCarbonCredits(travel.buyer, travel.travelEmission);
 
 			emit TravelCarbonFootprintOffset(
 				_requestId,
-				distance,
-				nights,
-				flightEmission,
-				hotelEmission,
-				travelEmission,
-				_buyer
+				travel.distance,
+				travel.nights,
+				travel.flightEmission,
+				travel.hotelEmission,
+				travel.travelEmission,
+				travel.buyer
 			);
 		} else if (
 			keccak256(abi.encodePacked(_flag)) ==
 			keccak256(abi.encodePacked('grosery'))
 		) {
-			string calldata moneySpentProteins = _args[
-				uint(groseryArgs.moneySpentProteins)
-			];
-			string calldata moneySpentFats = _args[uint(groseryArgs.moneySpentFats)];
-			string calldata moneySpentCarbs = _args[
-				uint(groseryArgs.moneySpentCarbs)
-			];
+			Grosery memory grosery = Grosery(
+				_args[uint(groseryArgs.moneySpentProteins)],
+				_args[uint(groseryArgs.moneySpentFats)],
+				_args[uint(groseryArgs.moneySpentCarbs)],
+				_returns[uint(groseryReturns.proteinsEmission)],
+				_returns[uint(groseryReturns.fatsEmission)],
+				_returns[uint(groseryReturns.carbsEmission)],
+				_returns[uint(groseryReturns.foodEmission)],
+				_buyer
+			);
 
-			uint256 proteinsEmission = _returns[
-				uint(groseryReturns.proteinsEmission)
-			];
-			uint256 fatsEmission = _returns[uint(groseryReturns.fatsEmission)];
-			uint256 carbsEmission = _returns[uint(groseryReturns.carbsEmission)];
-			uint256 foodEmission = _returns[uint(groseryReturns.foodEmission)];
+			groseryRequests[_requestId] = grosery;
 
-			buyCarbonCredits(_buyer, foodEmission);
-			retireCarbonCredits(_buyer, foodEmission);
+			buyCarbonCredits(grosery.buyer, grosery.foodEmission);
+			retireCarbonCredits(grosery.buyer, grosery.foodEmission);
 
 			emit GroseryCarbonFootprintOffset(
 				_requestId,
-				moneySpentProteins,
-				moneySpentFats,
-				moneySpentCarbs,
-				proteinsEmission,
-				fatsEmission,
-				carbsEmission,
-				foodEmission,
-				_buyer
+				grosery.moneySpentProteins,
+				grosery.moneySpentFats,
+				grosery.moneySpentCarbs,
+				grosery.proteinsEmission,
+				grosery.fatsEmission,
+				grosery.carbsEmission,
+				grosery.foodEmission,
+				grosery.buyer
 			);
 		} else {
 			revert('Invalid flag');
