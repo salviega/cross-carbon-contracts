@@ -1,24 +1,36 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import '@openzeppelin/contracts/utils/Strings.sol';
+
 import {FunctionsClient} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol';
 import {ConfirmedOwner} from '@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol';
 import {FunctionsRequest} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol';
 
-import {Travel} from './variables/structs/structs.sol';
-
 contract Calculator is FunctionsClient, ConfirmedOwner {
+	using Strings for string;
 	using FunctionsRequest for FunctionsRequest.Request;
 
 	bytes public s_lastError;
 	bytes public s_lastResponse;
 	bytes32 public s_lastRequestId;
 
-	mapping(bytes32 => Travel) public travels;
+	address public s_buyer;
+	string public s_lastFlag;
+	string[] public s_args;
+	uint256[] public s_returns;
 
 	error UnexpectedRequestID(bytes32 requestId);
 
 	event Response(bytes32 indexed requestId, bytes response, bytes err);
+
+	event TravelCarbonFootprintCalculated(
+		bytes32 indexed requestId,
+		string flag,
+		string[] args,
+		uint256[] values,
+		address buyer
+	);
 
 	constructor(
 		address router
@@ -35,6 +47,8 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 	 * @param subscriptionId Billing ID
 	 */
 	function sendRequest(
+		address buyer,
+		string calldata flag,
 		string memory source,
 		bytes memory encryptedSecretsUrls,
 		uint8 donHostedSecretsSlotID,
@@ -45,21 +59,31 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 		uint32 gasLimit,
 		bytes32 jobId
 	) external returns (bytes32 requestId) {
+		require(flag.equal('travel') || flag.equal('grosery'), 'Invalid flag');
+
 		FunctionsRequest.Request memory req;
 		req.initializeRequestForInlineJavaScript(source);
+
 		if (encryptedSecretsUrls.length > 0)
 			req.addSecretsReference(encryptedSecretsUrls);
 		else if (donHostedSecretsVersion > 0) {
 			req.addDONHostedSecrets(donHostedSecretsSlotID, donHostedSecretsVersion);
 		}
+
 		if (args.length > 0) req.setArgs(args);
+
 		if (bytesArgs.length > 0) req.setBytesArgs(bytesArgs);
+
+		s_lastFlag = flag;
+		s_buyer = buyer;
+
 		s_lastRequestId = _sendRequest(
 			req.encodeCBOR(),
 			subscriptionId,
 			gasLimit,
 			jobId
 		);
+
 		return s_lastRequestId;
 	}
 
@@ -97,7 +121,7 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 			revert('UnexpectedRequestID');
 		}
 
-		if (response.length > 0) {
+		if (response.length > 0 && s_lastFlag.equal('travel')) {
 			uint256 carbonFootprint = abi.decode(response, (uint256));
 
 			uint256 factor = 10 ** 18;
@@ -109,6 +133,14 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 			carbonFootprint %= factor;
 
 			uint256 _total = carbonFootprint;
+
+			emit TravelCarbonFootprintCalculated(
+				requestId,
+				s_lastFlag,
+				s_args,
+				s_returns,
+				s_buyer
+			);
 		}
 
 		s_lastResponse = response;
