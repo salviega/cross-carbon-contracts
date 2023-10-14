@@ -20,6 +20,7 @@ import {Grosery, Travel} from './variables/structs/structs.sol';
 
 contract Carbon is ERC20, ERC20Burnable, Ownable {
 	using Strings for address;
+	using Strings for string;
 	using Strings for uint;
 
 	ITCO2Faucet public TCO2FaucetExtense;
@@ -200,10 +201,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		uint256[] calldata _returns,
 		address _buyer
 	) external onlyOwner {
-		if (
-			keccak256(abi.encodePacked(_flag)) ==
-			keccak256(abi.encodePacked('travel'))
-		) {
+		if (_flag.equal('travel')) {
 			Travel memory travel = Travel(
 				_args[uint(travelArgs.distance)],
 				_args[uint(travelArgs.nights)],
@@ -227,10 +225,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 				travel.travelEmission,
 				travel.buyer
 			);
-		} else if (
-			keccak256(abi.encodePacked(_flag)) ==
-			keccak256(abi.encodePacked('grosery'))
-		) {
+		} else if (_flag.equal('grosery')) {
 			Grosery memory grosery = Grosery(
 				_args[uint(groseryArgs.moneySpentProteins)],
 				_args[uint(groseryArgs.moneySpentFats)],
@@ -258,8 +253,6 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 				grosery.foodEmission,
 				grosery.buyer
 			);
-		} else {
-			revert('Invalid flag');
 		}
 	}
 
