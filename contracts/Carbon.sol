@@ -16,7 +16,7 @@ import './interfaces/IPUSHCommInterface.sol';
 import './interfaces/ITCO2Faucet.sol';
 import './interfaces/ITCO2Token.sol';
 
-import {Travel} from './constants/structs/structs.sol';
+import {Travel} from './variables/structs/structs.sol';
 
 contract Carbon is ERC20, ERC20Burnable, Ownable {
 	using Strings for address;
@@ -35,6 +35,12 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 
 	event BougthCarbonCredits(address indexed buyer, uint256 amount);
 	event RetiredCarbonCredits(
+		address indexed buyer,
+		uint256 amount,
+		uint256 certificateId
+	);
+
+	event CarbonFootprintOffset(
 		address indexed buyer,
 		uint256 amount,
 		uint256 certificateId
@@ -147,7 +153,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 
 	// TODO: Calculate and Offset carbon footprint
 
-	function calculateTravelFootprint(
+	function offsetCarbonFootprint(
 		string memory _source,
 		bytes memory _encryptedSecretsUrls,
 		uint8 _donHostedSecretsSlotID,
@@ -184,7 +190,10 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 			total: total
 		});
 
-		return carbonFootprintTravel;
+		buyCarbonCredits(msg.sender, carbonFootprintTravel.total);
+		retireCarbonCredits(msg.sender, carbonFootprintTravel.total);
+
+		emit CarbonFootprintOffset(msg.sender, carbonFootprintTravel.total, 0);
 	}
 
 	function withdrawTCO2Tokens() public onlyOwner {

@@ -5,7 +5,7 @@ import {FunctionsClient} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_
 import {ConfirmedOwner} from '@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol';
 import {FunctionsRequest} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol';
 
-import {Travel} from './constants/structs/structs.sol';
+import {Travel} from './variables/structs/structs.sol';
 
 contract Calculator is FunctionsClient, ConfirmedOwner {
 	using FunctionsRequest for FunctionsRequest.Request;
