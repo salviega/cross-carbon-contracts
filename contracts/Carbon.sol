@@ -41,12 +41,26 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		uint256 certificateId
 	);
 
-	event CarbonFootprintOffset(
-		address indexed buyer,
-		string[] args,
-		uint256 distance,
-		uint256 nights,
-		uint256 total
+	event GroseryCarbonFootprintOffset(
+		bytes32 indexed requestId,
+		string moneySpentProteins,
+		string moneySpentFats,
+		string moneySpentCarbs,
+		uint256 proteinsEmission,
+		uint256 fatsEmission,
+		uint256 carbsEmission,
+		uint256 foodEmission,
+		address buyer
+	);
+
+	event TravelCarbonFootprintOffset(
+		bytes32 indexed requestId,
+		string distance,
+		string nights,
+		uint256 flightEmission,
+		uint256 hotelEmission,
+		uint256 travelEmission,
+		address buyer
 	);
 
 	constructor(
@@ -176,55 +190,72 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		emit RetiredCarbonCredits(_buyer, _amount, certificateId);
 	}
 
-	// TODO: Calculate and Offset carbon footprint
-
 	function offsetCarbonFootprint(
-		string memory _source,
-		bytes memory _encryptedSecretsUrls,
-		uint8 _donHostedSecretsSlotID,
-		uint64 _donHostedSecretsVersion,
-		string[] memory _args,
-		bytes[] memory _bytesArgs,
-		uint64 _subscriptionId,
-		uint32 _gasLimit,
-		bytes32 _jobId
-	) public onlyOwner returns (Travel memory carbonFootprintTravel) {
-		Calculator calculator = Calculator(CARBON_CALCULATOR_ADDRESS);
+		bytes32 _requestId,
+		string calldata _flag,
+		string[] calldata _args,
+		uint256[] calldata _returns,
+		address _buyer
+	) external onlyOwner {
+		if (
+			keccak256(abi.encodePacked(_flag)) ==
+			keccak256(abi.encodePacked('travel'))
+		) {
+			string calldata distance = _args[uint(travelArgs.distance)];
+			string calldata nights = _args[uint(travelArgs.nights)];
 
-		bytes32 requestId;
+			uint256 flightEmission = _returns[uint(travelReturns.flightEmission)];
+			uint256 hotelEmission = _returns[uint(travelReturns.hotelEmission)];
+			uint256 travelEmission = _returns[uint(travelReturns.travelEmission)];
 
-		requestId = calculator.sendRequest(
-			_source,
-			_encryptedSecretsUrls,
-			_donHostedSecretsSlotID,
-			_donHostedSecretsVersion,
-			_args,
-			_bytesArgs,
-			_subscriptionId,
-			_gasLimit,
-			_jobId
-		);
+			buyCarbonCredits(_buyer, travelEmission);
+			retireCarbonCredits(_buyer, travelEmission);
 
-		(uint256 distance, uint256 nights, uint256 total) = calculator.travels(
-			requestId
-		);
+			emit TravelCarbonFootprintOffset(
+				_requestId,
+				distance,
+				nights,
+				flightEmission,
+				hotelEmission,
+				travelEmission,
+				_buyer
+			);
+		} else if (
+			keccak256(abi.encodePacked(_flag)) ==
+			keccak256(abi.encodePacked('grosery'))
+		) {
+			string calldata moneySpentProteins = _args[
+				uint(groseryArgs.moneySpentProteins)
+			];
+			string calldata moneySpentFats = _args[uint(groseryArgs.moneySpentFats)];
+			string calldata moneySpentCarbs = _args[
+				uint(groseryArgs.moneySpentCarbs)
+			];
 
-		carbonFootprintTravel = Travel({
-			distance: distance,
-			nights: nights,
-			total: total
-		});
+			uint256 proteinsEmission = _returns[
+				uint(groseryReturns.proteinsEmission)
+			];
+			uint256 fatsEmission = _returns[uint(groseryReturns.fatsEmission)];
+			uint256 carbsEmission = _returns[uint(groseryReturns.carbsEmission)];
+			uint256 foodEmission = _returns[uint(groseryReturns.foodEmission)];
 
-		buyCarbonCredits(msg.sender, carbonFootprintTravel.total);
-		retireCarbonCredits(msg.sender, carbonFootprintTravel.total);
+			buyCarbonCredits(_buyer, foodEmission);
+			retireCarbonCredits(_buyer, foodEmission);
 
-		emit CarbonFootprintOffset(
-			msg.sender,
-			_args,
-			carbonFootprintTravel.distance,
-			carbonFootprintTravel.nights,
-			carbonFootprintTravel.total
-		);
+			emit GroseryCarbonFootprintOffset(
+				_requestId,
+				moneySpentProteins,
+				moneySpentFats,
+				moneySpentCarbs,
+				proteinsEmission,
+				fatsEmission,
+				carbsEmission,
+				foodEmission,
+				_buyer
+			);
+		} else {
+			revert('Invalid flag');
+		}
 	}
 
 	function withdrawTCO2Tokens() public onlyOwner {
