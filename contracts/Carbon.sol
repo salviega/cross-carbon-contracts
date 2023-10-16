@@ -151,7 +151,8 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 	function retireCarbonCredits(
 		address _buyer,
-		uint256 _amount
+		uint256 _amount,
+		string calldata _tokenURI
 	) public onlyOwner {
 		require(_amount > 0, 'Amount should be greater than 0');
 		require(_amount <= balanceOf(_buyer), 'Insufficient CARBON tokens');
@@ -170,7 +171,8 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		burn(_amount);
 
 		uint256 certificateId = ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(
-			_buyer
+			_buyer,
+			_tokenURI
 		);
 
 		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
@@ -200,7 +202,8 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		string calldata _flag,
 		string[] calldata _args,
 		uint256[] calldata _returns,
-		address _buyer
+		address _buyer,
+		string calldata _tokenURI
 	) external onlyOwner {
 		if (equal(_flag, 'travel')) {
 			Travel memory travel = Travel(
@@ -215,7 +218,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			travelRequests[_requestId] = travel;
 
 			buyCarbonCredits(travel.buyer, travel.travelEmission);
-			retireCarbonCredits(travel.buyer, travel.travelEmission);
+			retireCarbonCredits(travel.buyer, travel.travelEmission, _tokenURI);
 
 			emit TravelCarbonFootprintOffset(
 				_requestId,
@@ -243,7 +246,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			groceryRequests[_requestId] = grocery;
 
 			buyCarbonCredits(grocery.buyer, grocery.foodEmission);
-			retireCarbonCredits(grocery.buyer, grocery.foodEmission);
+			retireCarbonCredits(grocery.buyer, grocery.foodEmission, _tokenURI);
 
 			emit GroceryCarbonFootprintOffset(
 				_requestId,
