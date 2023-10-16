@@ -10,7 +10,7 @@ struct Travel {
 	address buyer;
 }
 
-struct Grosery {
+struct Grocery {
 	string moneySpentProteins;
 	string moneySpentFats;
 	string moneySpentCarbs;

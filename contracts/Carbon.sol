@@ -15,10 +15,11 @@ import './interfaces/ICertificate.sol';
 import './interfaces/IPUSHCommInterface.sol';
 import './interfaces/ITCO2Faucet.sol';
 import './interfaces/ITCO2Token.sol';
+import './helpers/helpers.sol';
 
-import {Grosery, Travel} from './variables/structs/structs.sol';
+import {Grocery, Travel} from './variables/structs/structs.sol';
 
-contract Carbon is ERC20, ERC20Burnable, Ownable {
+contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	using Strings for address;
 	using Strings for string;
 	using Strings for uint;
@@ -35,7 +36,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 	uint256 public carbonTokensMinted;
 
 	mapping(bytes32 => Travel) public travelRequests;
-	mapping(bytes32 => Grosery) public groseryRequests;
+	mapping(bytes32 => Grocery) public groceryRequests;
 
 	event BougthCarbonCredits(address indexed buyer, uint256 amount);
 
@@ -45,7 +46,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		uint256 certificateId
 	);
 
-	event GroseryCarbonFootprintOffset(
+	event GroceryCarbonFootprintOffset(
 		bytes32 indexed requestId,
 		string moneySpentProteins,
 		string moneySpentFats,
@@ -201,7 +202,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 		uint256[] calldata _returns,
 		address _buyer
 	) external onlyOwner {
-		if (_flag.equal('travel')) {
+		if (equal(_flag, 'travel')) {
 			Travel memory travel = Travel(
 				_args[uint(travelArgs.distance)],
 				_args[uint(travelArgs.nights)],
@@ -225,35 +226,40 @@ contract Carbon is ERC20, ERC20Burnable, Ownable {
 				travel.travelEmission,
 				travel.buyer
 			);
-		} else if (_flag.equal('grosery')) {
-			Grosery memory grosery = Grosery(
-				_args[uint(groseryArgs.moneySpentProteins)],
-				_args[uint(groseryArgs.moneySpentFats)],
-				_args[uint(groseryArgs.moneySpentCarbs)],
-				_returns[uint(groseryReturns.proteinsEmission)],
-				_returns[uint(groseryReturns.fatsEmission)],
-				_returns[uint(groseryReturns.carbsEmission)],
-				_returns[uint(groseryReturns.foodEmission)],
+
+			return;
+		} else if (equal(_flag, 'grocery')) {
+			Grocery memory grocery = Grocery(
+				_args[uint(groceryArgs.moneySpentProteins)],
+				_args[uint(groceryArgs.moneySpentFats)],
+				_args[uint(groceryArgs.moneySpentCarbs)],
+				_returns[uint(groceryReturns.proteinsEmission)],
+				_returns[uint(groceryReturns.fatsEmission)],
+				_returns[uint(groceryReturns.carbsEmission)],
+				_returns[uint(groceryReturns.foodEmission)],
 				_buyer
 			);
 
-			groseryRequests[_requestId] = grosery;
+			groceryRequests[_requestId] = grocery;
 
-			buyCarbonCredits(grosery.buyer, grosery.foodEmission);
-			retireCarbonCredits(grosery.buyer, grosery.foodEmission);
+			buyCarbonCredits(grocery.buyer, grocery.foodEmission);
+			retireCarbonCredits(grocery.buyer, grocery.foodEmission);
 
-			emit GroseryCarbonFootprintOffset(
+			emit GroceryCarbonFootprintOffset(
 				_requestId,
-				grosery.moneySpentProteins,
-				grosery.moneySpentFats,
-				grosery.moneySpentCarbs,
-				grosery.proteinsEmission,
-				grosery.fatsEmission,
-				grosery.carbsEmission,
-				grosery.foodEmission,
-				grosery.buyer
+				grocery.moneySpentProteins,
+				grocery.moneySpentFats,
+				grocery.moneySpentCarbs,
+				grocery.proteinsEmission,
+				grocery.fatsEmission,
+				grocery.carbsEmission,
+				grocery.foodEmission,
+				grocery.buyer
 			);
+
+			return;
 		}
+		revert('Invalid flag');
 	}
 
 	function withdrawTCO2Tokens() public onlyOwner {

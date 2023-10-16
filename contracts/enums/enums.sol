@@ -11,10 +11,15 @@ enum certificateArgs {
 	baseURI
 }
 
-enum groseryArgs {
+enum groceryArgs {
 	moneySpentProteins,
 	moneySpentFats,
 	moneySpentCarbs
+}
+
+enum sendRequestStringArgs {
+	flag,
+	source
 }
 
 enum travelArgs {
@@ -22,7 +27,7 @@ enum travelArgs {
 	nights
 }
 
-enum groseryReturns {
+enum groceryReturns {
 	proteinsEmission,
 	fatsEmission,
 	carbsEmission,

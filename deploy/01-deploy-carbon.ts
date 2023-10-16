@@ -42,6 +42,8 @@ const deployCarbon: DeployFunction = async function (
 		waitConfirmations: networkConfig[network.name].blockConfirmations || 1
 	})
 
+	log('\n')
+
 	if (
 		!developmentChains.includes(network.name) &&
 		(process.env.CELOSCAN_API_KEY || process.env.POLYGONSCAN_API_KEY)
@@ -53,6 +55,8 @@ const deployCarbon: DeployFunction = async function (
 		'Carbon',
 		CarbonContract.address
 	)
+
+	await verify(await carbonContract.CARBON_CALCULATOR_ADDRESS(), calculatorArgs)
 
 	log('----------------------------------------------------')
 	log('Setting up the certificate owner...')

@@ -1,35 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import '@openzeppelin/contracts/utils/Strings.sol';
-
 import {FunctionsClient} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol';
 import {ConfirmedOwner} from '@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol';
 import {FunctionsRequest} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol';
 
+/**
+ * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
+ * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
+ * DO NOT USE THIS CODE IN PRODUCTION.
+ */
 contract Calculator is FunctionsClient, ConfirmedOwner {
-	using Strings for string;
 	using FunctionsRequest for FunctionsRequest.Request;
 
-	bytes public s_lastError;
-	bytes public s_lastResponse;
 	bytes32 public s_lastRequestId;
+	bytes public s_lastResponse;
+	bytes public s_lastError;
 
-	address public s_buyer;
+	address public s_lastBuyer;
 	string public s_lastFlag;
-	string[] public s_args;
-	uint256[] public s_returns;
+	string[] public s_lastArgs;
+	uint256[] public s_lastReturns;
 
 	error UnexpectedRequestID(bytes32 requestId);
 
 	event Response(bytes32 indexed requestId, bytes response, bytes err);
 
-	event TravelCarbonFootprintCalculated(
+	event CarbonFootprintCalculated(
 		bytes32 indexed requestId,
-		string flag,
-		string[] args,
-		uint256[] values,
-		address buyer
+		string s_lastFlag,
+		string[] s_lastArgs,
+		uint256[] s_lastReturns,
+		address s_lastBuyer
 	);
 
 	constructor(
@@ -48,7 +50,7 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 	 */
 	function sendRequest(
 		address buyer,
-		string calldata flag,
+		string memory flag,
 		string memory source,
 		bytes memory encryptedSecretsUrls,
 		uint8 donHostedSecretsSlotID,
@@ -59,8 +61,6 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 		uint32 gasLimit,
 		bytes32 jobId
 	) external returns (bytes32 requestId) {
-		require(flag.equal('travel') || flag.equal('grosery'), 'Invalid flag');
-
 		FunctionsRequest.Request memory req;
 		req.initializeRequestForInlineJavaScript(source);
 
@@ -74,8 +74,9 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 
 		if (bytesArgs.length > 0) req.setBytesArgs(bytesArgs);
 
+		s_lastBuyer = buyer;
 		s_lastFlag = flag;
-		s_buyer = buyer;
+		s_lastArgs = args;
 
 		s_lastRequestId = _sendRequest(
 			req.encodeCBOR(),
@@ -118,33 +119,37 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 		bytes memory err
 	) internal override {
 		if (s_lastRequestId != requestId) {
-			revert('UnexpectedRequestID');
+			revert UnexpectedRequestID(requestId);
 		}
 
-		if (response.length > 0 && s_lastFlag.equal('travel')) {
-			uint256 carbonFootprint = abi.decode(response, (uint256));
+		uint256 carbonFootprint = abi.decode(response, (uint256));
 
-			uint256 factor = 10 ** 18;
+		uint256 factor = 10 ** 18;
 
-			uint256 _distance = carbonFootprint / (factor * factor);
-			carbonFootprint %= (factor * factor);
+		uint256 _distance = carbonFootprint / (factor * factor);
+		carbonFootprint %= (factor * factor);
 
-			uint256 _nights = carbonFootprint / factor;
-			carbonFootprint %= factor;
+		uint256 _nights = carbonFootprint / factor;
+		carbonFootprint %= factor;
 
-			uint256 _total = carbonFootprint;
+		uint256 _total = carbonFootprint;
 
-			emit TravelCarbonFootprintCalculated(
-				requestId,
-				s_lastFlag,
-				s_args,
-				s_returns,
-				s_buyer
-			);
-		}
+		s_lastReturns = new uint256[](3);
+		s_lastReturns[0] = _distance;
+		s_lastReturns[1] = _nights;
+		s_lastReturns[2] = _total;
 
 		s_lastResponse = response;
 		s_lastError = err;
+
+		emit CarbonFootprintCalculated(
+			requestId,
+			s_lastFlag,
+			s_lastArgs,
+			s_lastReturns,
+			s_lastBuyer
+		);
+
 		emit Response(requestId, s_lastResponse, s_lastError);
 	}
 }
