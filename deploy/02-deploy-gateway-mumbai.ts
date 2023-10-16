@@ -12,7 +12,7 @@ import {
 } from '../constants/constants'
 import IERC20ExtendedJson from '../artifacts/contracts/interfaces/IERC20Extended.sol/IERC20Extended.json'
 
-const deployCarbon: DeployFunction = async function (
+const deployGateway: DeployFunction = async function (
 	hre: HardhatRuntimeEnvironment
 ) {
 	// @ts-ignore
@@ -76,5 +76,5 @@ const deployCarbon: DeployFunction = async function (
 	log('\n')
 }
 
-export default deployCarbon
-deployCarbon.tags = ['all', 'Carbon']
+export default deployGateway
+deployGateway.tags = ['all', 'mumbai']
