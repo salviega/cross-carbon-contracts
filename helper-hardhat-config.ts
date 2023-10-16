@@ -17,6 +17,12 @@ export const networkConfig: networkConfigInfo = {
 	},
 	mumbai: {
 		blockConfirmations: 3
+	},
+	optimismGoerli: {
+		blockConfirmations: 3
+	},
+	sepolia: {
+		blockConfirmations: 3
 	}
 }
 

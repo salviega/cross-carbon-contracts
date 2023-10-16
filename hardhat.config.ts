@@ -11,7 +11,15 @@ import { CustomHardhatConfig } from './models/custom-hardhat-config.model'
 
 require('dotenv').config()
 
-const { CELOSCAN_API_KEY, POLYGONSCAN_API_KEY, PRIVATE_KEY } = process.env
+const {
+	CELOSCAN_API_KEY,
+	OPTIMISMN_GOERLI_RPC_URL,
+	OPTIMISMNSCAN_API_KEY,
+	POLYGONSCAN_API_KEY,
+	PRIVATE_KEY,
+	SEPORLIA_RPC_URL,
+	SEPOLIASCAN_API_KEY
+} = process.env
 
 const SOLC_SETTINGS = {
 	optimizer: {
@@ -47,6 +55,20 @@ const config: CustomHardhatConfig = {
 			gas: 6000000, // Increase the gas limit
 			gasPrice: 10000000000 // Set a custom gas price (in Gwei, optional)
 		},
+		optimismGoerli: {
+			chainId: 420,
+			accounts: [PRIVATE_KEY || ''],
+			url: OPTIMISMN_GOERLI_RPC_URL || '',
+			gas: 6000000, // Increase the gas limit
+			gasPrice: 10000000000 // Set a custom gas price (in Gwei, optional)
+		},
+		sepolia: {
+			chainId: 11155111,
+			accounts: [PRIVATE_KEY || ''],
+			url: SEPORLIA_RPC_URL || '',
+			gas: 6000000, // Increase the gas limit
+			gasPrice: 10000000000 // Set a custom gas price (in Gwei, optional)
+		},
 		coverage: {
 			url: 'http://127.0.0.1:8555' // Coverage launches its own ganache-cli client
 		}
@@ -54,7 +76,9 @@ const config: CustomHardhatConfig = {
 	etherscan: {
 		apiKey: {
 			alfajores: CELOSCAN_API_KEY || '',
-			polygonMumbai: POLYGONSCAN_API_KEY || ''
+			optimismnGoerli: OPTIMISMNSCAN_API_KEY || '',
+			polygonMumbai: POLYGONSCAN_API_KEY || '',
+			sepolia: SEPOLIASCAN_API_KEY || ''
 		}
 	},
 	gasReporter: {
