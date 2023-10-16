@@ -5,12 +5,14 @@ import {FunctionsClient} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_
 import {ConfirmedOwner} from '@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol';
 import {FunctionsRequest} from '@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol';
 
+import './helpers/helpers.sol';
+
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract Calculator is FunctionsClient, ConfirmedOwner {
+contract Calculator is FunctionsClient, ConfirmedOwner, Helpers {
 	using FunctionsRequest for FunctionsRequest.Request;
 
 	bytes32 public s_lastRequestId;
@@ -122,33 +124,62 @@ contract Calculator is FunctionsClient, ConfirmedOwner {
 			revert UnexpectedRequestID(requestId);
 		}
 
-		uint256 carbonFootprint = abi.decode(response, (uint256));
+		if (response.length > 0 && equal(s_lastFlag, 'travel')) {
+			uint256 carbonFootprint = abi.decode(response, (uint256));
+			uint256 factor = 10 ** 18;
 
-		uint256 factor = 10 ** 18;
+			uint256 _distance = carbonFootprint / (factor * factor);
+			carbonFootprint %= (factor * factor);
 
-		uint256 _distance = carbonFootprint / (factor * factor);
-		carbonFootprint %= (factor * factor);
+			uint256 _nights = carbonFootprint / factor;
+			carbonFootprint %= factor;
 
-		uint256 _nights = carbonFootprint / factor;
-		carbonFootprint %= factor;
+			uint256 _total = carbonFootprint;
 
-		uint256 _total = carbonFootprint;
+			s_lastReturns = new uint256[](3);
+			s_lastReturns[0] = _distance;
+			s_lastReturns[1] = _nights;
+			s_lastReturns[2] = _total;
 
-		s_lastReturns = new uint256[](3);
-		s_lastReturns[0] = _distance;
-		s_lastReturns[1] = _nights;
-		s_lastReturns[2] = _total;
+			s_lastResponse = response;
+			s_lastError = err;
 
-		s_lastResponse = response;
-		s_lastError = err;
+			emit CarbonFootprintCalculated(
+				requestId,
+				s_lastFlag,
+				s_lastArgs,
+				s_lastReturns,
+				s_lastBuyer
+			);
+		} else if (response.length > 0 && equal(s_lastFlag, 'grocery')) {
+			uint256 carbonFootprint = abi.decode(response, (uint256));
+			uint256 factor = 10 ** 18;
 
-		emit CarbonFootprintCalculated(
-			requestId,
-			s_lastFlag,
-			s_lastArgs,
-			s_lastReturns,
-			s_lastBuyer
-		);
+			uint256 _proteins = carbonFootprint / (factor * factor * factor);
+			carbonFootprint %= (factor * factor * factor);
+
+			uint256 _fats = carbonFootprint / (factor * factor);
+			carbonFootprint %= (factor * factor);
+
+			uint256 _carbs = carbonFootprint / factor;
+			carbonFootprint %= factor;
+
+			uint256 _total = carbonFootprint;
+
+			s_lastReturns = new uint256[](4);
+			s_lastReturns[0] = _proteins;
+			s_lastReturns[1] = _fats;
+			s_lastReturns[2] = _carbs;
+			s_lastReturns[3] = _total;
+
+			emit CarbonFootprintCalculated(
+				requestId,
+				s_lastFlag,
+				s_lastArgs,
+				s_lastReturns,
+				s_lastBuyer
+			);
+		}
 
 		emit Response(requestId, s_lastResponse, s_lastError);
 	}
