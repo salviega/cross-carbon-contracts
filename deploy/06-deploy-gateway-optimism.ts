@@ -5,7 +5,9 @@ import verify from '../helper-functions'
 import { ethers } from 'hardhat'
 import { Contract, ethers as ethersType } from 'ethers'
 import {
+	ALBITRUM_CHAIN_SELECTOR,
 	MUMBAI_CHAIN_SELECTOR,
+	SEPOLIA_CHAIN_SELECTOR,
 	OPTIMISM_EPNS_COMM_ADDRESS,
 	OPTIMISM_CCIP_ROUTER,
 	OPTIMISM_LINK_TOKEN
@@ -50,9 +52,29 @@ const deployGateway: DeployFunction = async function (
 		GatewayContract.address
 	)
 
-	const whitelistChainTx = await gatewayContract.whitelistChain(
-		MUMBAI_CHAIN_SELECTOR
+	log('----------------------------------------------------')
+	log('Setting up whitelist to Albitrum chain...')
+	log('\n')
+
+	let whitelistChainTx = await gatewayContract.whitelistChain(
+		ALBITRUM_CHAIN_SELECTOR
 	)
+	await whitelistChainTx.wait(1)
+
+	log('----------------------------------------------------')
+	log('Setting up whitelist to Sepolia chain...')
+	log('\n')
+
+	whitelistChainTx = await gatewayContract.whitelistChain(
+		SEPOLIA_CHAIN_SELECTOR
+	)
+	await whitelistChainTx.wait(1)
+
+	log('----------------------------------------------------')
+	log('Setting up whitelist to Mumbai chain...')
+	log('\n')
+
+	whitelistChainTx = await gatewayContract.whitelistChain(MUMBAI_CHAIN_SELECTOR)
 	await whitelistChainTx.wait(1)
 
 	const LINK_DECIMALS = 18
@@ -77,4 +99,4 @@ const deployGateway: DeployFunction = async function (
 }
 
 export default deployGateway
-deployGateway.tags = ['all', 'sepolia']
+deployGateway.tags = ['all', 'optimism']

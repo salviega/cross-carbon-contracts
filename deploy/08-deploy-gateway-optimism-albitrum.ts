@@ -5,12 +5,12 @@ import verify from '../helper-functions'
 import { ethers } from 'hardhat'
 import { Contract, ethers as ethersType } from 'ethers'
 import {
-	ALBITRUM_CHAIN_SELECTOR,
+	ALBITRUM_EPNS_COMM_ADDRESS,
+	ALBITRUM_CCIP_ROUTER,
+	ALBITRUM_LINK_TOKEN,
 	MUMBAI_CHAIN_SELECTOR,
 	OPTIMISM_CHAIN_SELECTOR,
-	SEPOLIA_EPNS_COMM_ADDRESS,
-	SEPOLIA_CCIP_ROUTER,
-	SEPOLIA_LINK_TOKEN
+	SEPOLIA_CHAIN_SELECTOR
 } from '../constants/constants'
 import IERC20ExtendedJson from '../artifacts/contracts/interfaces/IERC20Extended.sol/IERC20Extended.json'
 
@@ -26,9 +26,9 @@ const deployGateway: DeployFunction = async function (
 	log('Deploying Gateway contract and waiting for confirmations...')
 
 	const args: any[] = [
-		SEPOLIA_CCIP_ROUTER, // _router
-		SEPOLIA_LINK_TOKEN, // _linkToken
-		SEPOLIA_EPNS_COMM_ADDRESS // _EPNS_COMM_ADDRESS
+		ALBITRUM_CCIP_ROUTER, // _router
+		ALBITRUM_LINK_TOKEN, // _linkToken
+		ALBITRUM_EPNS_COMM_ADDRESS // _EPNS_COMM_ADDRESS
 	]
 
 	const GatewayContract: DeployResult = await deploy('Gateway', {
@@ -53,20 +53,20 @@ const deployGateway: DeployFunction = async function (
 	)
 
 	log('----------------------------------------------------')
-	log('Setting up whitelist to Albitrum chain...')
+	log('Setting up whitelist to Optimism chain...')
 	log('\n')
 
 	let whitelistChainTx = await gatewayContract.whitelistChain(
-		ALBITRUM_CHAIN_SELECTOR
+		OPTIMISM_CHAIN_SELECTOR
 	)
 	await whitelistChainTx.wait(1)
 
 	log('----------------------------------------------------')
-	log('Setting up whitelist to Optimism chain...')
+	log('Setting up whitelist to Sepolia chain...')
 	log('\n')
 
 	whitelistChainTx = await gatewayContract.whitelistChain(
-		OPTIMISM_CHAIN_SELECTOR
+		SEPOLIA_CHAIN_SELECTOR
 	)
 	await whitelistChainTx.wait(1)
 
@@ -82,7 +82,7 @@ const deployGateway: DeployFunction = async function (
 
 	const linkTokenContract: Contract = await ethers.getContractAt(
 		IERC20ExtendedJson.abi,
-		SEPOLIA_LINK_TOKEN
+		ALBITRUM_LINK_TOKEN
 	)
 
 	log('----------------------------------------------------')
@@ -99,4 +99,4 @@ const deployGateway: DeployFunction = async function (
 }
 
 export default deployGateway
-deployGateway.tags = ['all', 'sepolia']
+deployGateway.tags = ['all', 'albitrum']

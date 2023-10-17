@@ -8,6 +8,8 @@ import {
 	MUMBAI_CCIP_ROUTER,
 	MUMBAI_EPNS_COMM_ADDRESS,
 	MUMBAI_LINK_TOKEN,
+	ALBITRUM_CHAIN_SELECTOR,
+	OPTIMISM_CHAIN_SELECTOR,
 	SEPOLIA_CHAIN_SELECTOR
 } from '../constants/constants'
 import IERC20ExtendedJson from '../artifacts/contracts/interfaces/IERC20Extended.sol/IERC20Extended.json'
@@ -50,7 +52,29 @@ const deployGateway: DeployFunction = async function (
 		GatewayContract.address
 	)
 
-	const whitelistChainTx = await gatewayContract.whitelistChain(
+	log('----------------------------------------------------')
+	log('Setting up whitelist to Albitrum chain...')
+	log('\n')
+
+	let whitelistChainTx = await gatewayContract.whitelistChain(
+		ALBITRUM_CHAIN_SELECTOR
+	)
+	await whitelistChainTx.wait(1)
+
+	log('----------------------------------------------------')
+	log('Setting up whitelist to Optimism chain...')
+	log('\n')
+
+	whitelistChainTx = await gatewayContract.whitelistChain(
+		OPTIMISM_CHAIN_SELECTOR
+	)
+	await whitelistChainTx.wait(1)
+
+	log('----------------------------------------------------')
+	log('Setting up whitelist to Sepolia chain...')
+	log('\n')
+
+	whitelistChainTx = await gatewayContract.whitelistChain(
 		SEPOLIA_CHAIN_SELECTOR
 	)
 	await whitelistChainTx.wait(1)
@@ -65,6 +89,7 @@ const deployGateway: DeployFunction = async function (
 
 	log('----------------------------------------------------')
 	log('Transferring 2 LINKs to the Gateway contract...')
+	log('\n')
 
 	const transferLinkTx = await linkTokenContract.transfer(
 		GatewayContract.address,
