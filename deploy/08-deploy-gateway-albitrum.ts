@@ -52,29 +52,31 @@ const deployGateway: DeployFunction = async function (
 		GatewayContract.address
 	)
 
-	log('----------------------------------------------------')
-	log('Setting up whitelist to Optimism chain...')
-	log('\n')
+	// log('----------------------------------------------------')
+	// log('Setting up whitelist to Optimism chain...')
+	// log('\n')
 
-	let whitelistChainTx = await gatewayContract.whitelistChain(
-		OPTIMISM_CHAIN_SELECTOR
-	)
-	await whitelistChainTx.wait(1)
+	// let whitelistChainTx = await gatewayContract.whitelistChain(
+	// 	OPTIMISM_CHAIN_SELECTOR
+	// )
+	// await whitelistChainTx.wait(1)
 
-	log('----------------------------------------------------')
-	log('Setting up whitelist to Sepolia chain...')
-	log('\n')
+	// log('----------------------------------------------------')
+	// log('Setting up whitelist to Sepolia chain...')
+	// log('\n')
 
-	whitelistChainTx = await gatewayContract.whitelistChain(
-		SEPOLIA_CHAIN_SELECTOR
-	)
-	await whitelistChainTx.wait(1)
+	// whitelistChainTx = await gatewayContract.whitelistChain(
+	// 	SEPOLIA_CHAIN_SELECTOR
+	// )
+	// await whitelistChainTx.wait(1)
 
 	log('----------------------------------------------------')
 	log('Setting up whitelist to Mumbai chain...')
 	log('\n')
 
-	whitelistChainTx = await gatewayContract.whitelistChain(MUMBAI_CHAIN_SELECTOR)
+	let whitelistChainTx = await gatewayContract.whitelistChain(
+		MUMBAI_CHAIN_SELECTOR
+	)
 	await whitelistChainTx.wait(1)
 
 	const LINK_DECIMALS = 18

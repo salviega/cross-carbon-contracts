@@ -12,7 +12,7 @@ import { CustomHardhatConfig } from './models/custom-hardhat-config.model'
 require('dotenv').config()
 
 const {
-	ALBITRALBITRUM_GOERLI_RPC_URL,
+	ALBITRUM_GOERLI_RPC_URL,
 	ALBITRUMSCAN_API_KEY,
 	CELOSCAN_API_KEY,
 	OPTIMISMN_GOERLI_RPC_URL,
@@ -46,7 +46,7 @@ const config: CustomHardhatConfig = {
 		albitrumGoerli: {
 			chainId: 421613,
 			accounts: [PRIVATE_KEY || ''],
-			url: ALBITRALBITRUM_GOERLI_RPC_URL || '',
+			url: ALBITRUM_GOERLI_RPC_URL || '',
 			gas: 6000000, // Increase the gas limit
 			gasPrice: 10000000000 // Set a custom gas price (in Gwei, optional)
 		},
