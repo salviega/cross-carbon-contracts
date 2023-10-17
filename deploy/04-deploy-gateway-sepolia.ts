@@ -21,7 +21,7 @@ const deployGateway: DeployFunction = async function (
 	const { deployer } = await getNamedAccounts()
 
 	log('----------------------------------------------------')
-	log('Deploying Sepolia Gateway contract and waiting for confirmations...')
+	log('Deploying Gateway contract and waiting for confirmations...')
 
 	const args: any[] = [
 		SEPOLIA_CCIP_ROUTER, // _router
@@ -40,7 +40,7 @@ const deployGateway: DeployFunction = async function (
 
 	if (
 		!developmentChains.includes(network.name) &&
-		process.env.SEPOLIANSCAN_API_KEY
+		process.env.SEPOLIASCAN_API_KEY
 	) {
 		await verify(GatewayContract.address, args)
 	}

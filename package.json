@@ -10,8 +10,9 @@
 		"clean": "rm -rf ./artifacts ./cache ./typechain-types ./deployments",
 		"compile": "hardhat compile",
 		"deploy": "hardhat deploy",
-		"deploy:sepolia": "hardhay deploy --network sepolia --tags sepolia",
-		"deploy:mumbai": "yarn deploy --network mumbai --tags mumbai",
+		"deploy:mumbai": "hardhat deploy --network mumbai --tags mumbai",
+		"deploy:sepolia": "hardhat deploy --network sepolia --tags sepolia",
+		"deploy:optimism": "hardhat deploy --network optimism --tags optimism",
 		"format": "prettier --write \"./**/*.{js,jsx,ts,tsx,sol}\"",
 		"test": "hardhat test",
 		"typechain": "yarn hardhat typechain"

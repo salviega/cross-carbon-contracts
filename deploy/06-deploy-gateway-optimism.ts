@@ -5,10 +5,10 @@ import verify from '../helper-functions'
 import { ethers } from 'hardhat'
 import { Contract, ethers as ethersType } from 'ethers'
 import {
-	MUMBAI_CCIP_ROUTER,
-	MUMBAI_EPNS_COMM_ADDRESS,
-	MUMBAI_LINK_TOKEN,
-	SEPOLIA_CHAIN_SELECTOR
+	MUMBAI_CHAIN_SELECTOR,
+	OPTIMISM_EPNS_COMM_ADDRESS,
+	OPTIMISM_CCIP_ROUTER,
+	OPTIMISM_LINK_TOKEN
 } from '../constants/constants'
 import IERC20ExtendedJson from '../artifacts/contracts/interfaces/IERC20Extended.sol/IERC20Extended.json'
 
@@ -24,9 +24,9 @@ const deployGateway: DeployFunction = async function (
 	log('Deploying Gateway contract and waiting for confirmations...')
 
 	const args: any[] = [
-		MUMBAI_CCIP_ROUTER, // _router
-		MUMBAI_LINK_TOKEN, // _linkToken
-		MUMBAI_EPNS_COMM_ADDRESS // _EPNS_COMM_ADDRESS
+		OPTIMISM_CCIP_ROUTER, // _router
+		OPTIMISM_LINK_TOKEN, // _linkToken
+		OPTIMISM_EPNS_COMM_ADDRESS // _EPNS_COMM_ADDRESS
 	]
 
 	const GatewayContract: DeployResult = await deploy('Gateway', {
@@ -40,7 +40,7 @@ const deployGateway: DeployFunction = async function (
 
 	if (
 		!developmentChains.includes(network.name) &&
-		process.env.POLYGONSCAN_API_KEY
+		process.env.SEPOLIASCAN_API_KEY
 	) {
 		await verify(GatewayContract.address, args)
 	}
@@ -51,7 +51,7 @@ const deployGateway: DeployFunction = async function (
 	)
 
 	const whitelistChainTx = await gatewayContract.whitelistChain(
-		SEPOLIA_CHAIN_SELECTOR
+		MUMBAI_CHAIN_SELECTOR
 	)
 	await whitelistChainTx.wait(1)
 
@@ -60,7 +60,7 @@ const deployGateway: DeployFunction = async function (
 
 	const linkTokenContract: Contract = await ethers.getContractAt(
 		IERC20ExtendedJson.abi,
-		MUMBAI_LINK_TOKEN
+		OPTIMISM_LINK_TOKEN
 	)
 
 	log('----------------------------------------------------')
@@ -77,4 +77,4 @@ const deployGateway: DeployFunction = async function (
 }
 
 export default deployGateway
-deployGateway.tags = ['all', 'mumbai']
+deployGateway.tags = ['all', 'sepolia']

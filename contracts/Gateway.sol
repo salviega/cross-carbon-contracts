@@ -99,28 +99,28 @@ contract Gateway is OwnerIsCreator {
 
 		messageId = router.ccipSend(_destinationChainSelector, evm2AnyMessage);
 
-		if (EPNS_COMM_ADDRESS != address(0)) {
-			IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
-				0xaA7880DB88D8e051428b5204817e58D8327340De, // from channel
-				msg.sender,
-				bytes(
-					string(
-						abi.encodePacked(
-							'0',
-							'+',
-							'3',
-							'+',
-							'Congrats!',
-							'+',
-							'You just sent ',
-							(_amount / (10 ** uint(IERC20Extended(_token).decimals())))
-								.toString(),
-							' CARBON! to Optimism'
-						)
-					)
-				)
-			);
-		}
+		// if (EPNS_COMM_ADDRESS != address(0)) {
+		// 	IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
+		// 		0xaA7880DB88D8e051428b5204817e58D8327340De, // from channel
+		// 		msg.sender,
+		// 		bytes(
+		// 			string(
+		// 				abi.encodePacked(
+		// 					'0',
+		// 					'+',
+		// 					'3',
+		// 					'+',
+		// 					'Congrats!',
+		// 					'+',
+		// 					'You just sent ',
+		// 					(_amount / (10 ** uint(IERC20Extended(_token).decimals())))
+		// 						.toString(),
+		// 					' CARBON! to Optimism'
+		// 				)
+		// 			)
+		// 		)
+		// 	);
+		// }
 
 		emit TokensTransferred(
 			messageId,

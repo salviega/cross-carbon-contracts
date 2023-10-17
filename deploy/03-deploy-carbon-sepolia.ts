@@ -8,8 +8,7 @@ import {
 	SEPOLIA_TCO2FAUCET,
 	SEPOLIA_TCO2TOKEN,
 	SEPOLIA_EPNS_COMM_ADDRESS,
-	SEPOLIA_FUNCTIONS_ROUTER,
-	SEPOLIA_LINK_TOKEN
+	SEPOLIA_FUNCTIONS_ROUTER
 } from '../constants/constants'
 
 const deployCarbon: DeployFunction = async function (
@@ -21,6 +20,7 @@ const deployCarbon: DeployFunction = async function (
 	const { deployer } = await getNamedAccounts()
 
 	log('----------------------------------------------------')
+	log('------------------- Sepolia ------------------------')
 	log('Deploying Carbon contract and waiting for confirmations...')
 
 	let certificateArgs = [
@@ -52,7 +52,7 @@ const deployCarbon: DeployFunction = async function (
 
 	if (
 		!developmentChains.includes(network.name) &&
-		process.env.SEPOLIANSCAN_API_KEY
+		process.env.SEPOLIASCAN_API_KEY
 	) {
 		await verify(CarbonContract.address, args)
 	}

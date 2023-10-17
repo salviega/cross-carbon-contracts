@@ -5,10 +5,10 @@ import verify from '../helper-functions'
 import { ethers } from 'hardhat'
 import { Contract } from 'ethers'
 import {
-	MUMBAI_TCO2FAUCET,
-	MUMBAI_TCO2TOKEN,
-	MUMBAI_EPNS_COMM_ADDRESS,
-	MUMBAI_FUNCTIONS_ROUTER
+	OPTIMISM_TCO2FAUCET,
+	OPTIMISM_TCO2TOKEN,
+	OPTIMISM_EPNS_COMM_ADDRESS,
+	OPTIMISM_FUNCTIONS_ROUTER
 } from '../constants/constants'
 
 const deployCarbon: DeployFunction = async function (
@@ -20,23 +20,23 @@ const deployCarbon: DeployFunction = async function (
 	const { deployer } = await getNamedAccounts()
 
 	log('----------------------------------------------------')
-	log('------------------- Mumbai -------------------------')
+	log('------------------- Optimism -----------------------')
 	log('Deploying Carbon contract and waiting for confirmations...')
 
-	let certificateArgs: string[] = [
+	let certificateArgs = [
 		'Certificate', //_name
 		'CERT', // _symbol
 		'https://api.carbon.fyi/certificate/' // _baseURI
 	]
 
-	let calculatorArgs: string[] = [
-		MUMBAI_FUNCTIONS_ROUTER // _router
+	let calculatorArgs = [
+		OPTIMISM_FUNCTIONS_ROUTER // _router
 	]
 
-	let args: any[] = [
-		MUMBAI_TCO2FAUCET, // _TCO2Faucet
-		MUMBAI_TCO2TOKEN, // _TCO2Token
-		MUMBAI_EPNS_COMM_ADDRESS, // _EPNS_COMM_ADDRESS
+	let args = [
+		OPTIMISM_TCO2FAUCET, // _TCO2Faucet
+		OPTIMISM_TCO2TOKEN, // _TCO2Token
+		OPTIMISM_EPNS_COMM_ADDRESS, // _EPNS_COMM_ADDRESS
 		certificateArgs, // _certificateArgs
 		calculatorArgs // _calculatorArgs
 	]
@@ -52,20 +52,14 @@ const deployCarbon: DeployFunction = async function (
 
 	if (
 		!developmentChains.includes(network.name) &&
-		process.env.POLYGONSCAN_API_KEY
+		process.env.SEPOLIASCAN_API_KEY
 	) {
 		await verify(CarbonContract.address, args)
 	}
 
-	let carbonContract: Contract = await ethers.getContractAt(
-		'Carbon',
-		CarbonContract.address
-	)
-
-	await verify(await carbonContract.CARBON_CALCULATOR_ADDRESS(), calculatorArgs)
-
 	log('----------------------------------------------------')
 	log('Setting up the certificate owner...')
+	log('\n')
 
 	let certificateContract: Contract = await ethers.getContractAt(
 		'Certificate',
@@ -78,24 +72,7 @@ const deployCarbon: DeployFunction = async function (
 	await transferCertificateOwnershipTx.wait(1)
 
 	log('Carbon contract is the new owner of the certificate contract.')
-	log('\n')
-
-	let calculatorContract: Contract = await ethers.getContractAt(
-		'Calculator',
-		deployer
-	)
-
-	log('----------------------------------------------------')
-	log('Setting up the certificate owner...')
-
-	let transferCalculatorOwnershipTx =
-		await calculatorContract.transferOwnership(CarbonContract.address)
-
-	await transferCalculatorOwnershipTx.wait(1)
-
-	log('Carbon contract is the new owner of the calculator contract.')
-	log('\n')
 }
 
 export default deployCarbon
-deployCarbon.tags = ['all', 'mumbai']
+deployCarbon.tags = ['all', 'optimism']
