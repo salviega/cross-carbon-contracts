@@ -42,7 +42,7 @@ const deployGateway: DeployFunction = async function (
 
 	if (
 		!developmentChains.includes(network.name) &&
-		process.env.SEPOLIASCAN_API_KEY
+		process.env.ALBITRUMSCAN_API_KEY
 	) {
 		await verify(GatewayContract.address, args)
 	}
