@@ -14,7 +14,7 @@
 		"deploy:mumbai": "hardhat deploy --network mumbai --tags mumbai",
 		"deploy:optimism": "hardhat deploy --network optimism --tags optimism",
 		"deploy:sepolia": "hardhat deploy --network sepolia --tags sepolia",
-		"deploy:omni": "hardhat deploy --network albitrum --tags albitrum && hardhat deploy --network mumbai --tags mumbai && hardhat deploy --network optimism --tags optimism && hardhat deploy --network sepolia --tags sepolia",
+		"deploy:omni": "hardhat deploy --network mumbai --tags mumbai && hardhat deploy --network albitrum --tags albitrum && hardhat deploy --network optimism --tags optimism && hardhat deploy --network sepolia --tags sepolia",
 		"format": "prettier --write \"./**/*.{js,jsx,ts,tsx,sol}\"",
 		"test": "hardhat test",
 		"typechain": "yarn hardhat typechain"
