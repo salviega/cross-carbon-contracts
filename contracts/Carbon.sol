@@ -28,7 +28,6 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	ITCO2Token public TCO2TokenExtense;
 
 	address public EPNS_COMM_ADDRESS;
-	address public LINK_TOKEN_ADDRESS;
 	address public CARBON_CERTIFICATE_ADDRESS;
 	address public CARBON_CALCULATOR_ADDRESS;
 
@@ -72,7 +71,6 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address _TCO2Faucet,
 		address _TCO2Token,
 		address _EPNS_COMM_ADDRESS,
-		address _LINK_TOKEN_ADDRESS,
 		string[] memory _certificateArgs,
 		address[] memory _calculatorArgs
 	) ERC20('carbon', 'CARBON') Ownable(msg.sender) {
@@ -90,7 +88,6 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		TCO2TokenExtense = ITCO2Token(_TCO2Token);
 
 		EPNS_COMM_ADDRESS = _EPNS_COMM_ADDRESS;
-		LINK_TOKEN_ADDRESS = _LINK_TOKEN_ADDRESS;
 
 		Certificate certificate = new Certificate(
 			_certificateArgs[uint(certificateArgs.name)],
@@ -98,17 +95,21 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			_certificateArgs[uint(certificateArgs.baseURI)]
 		);
 
-		Calculator calculator = new Calculator(
-			_calculatorArgs[uint(calculatorArgs.router)]
-		);
-
 		CARBON_CERTIFICATE_ADDRESS = address(certificate);
-		CARBON_CALCULATOR_ADDRESS = address(calculator);
 
-		ILinkTokenInterface(_LINK_TOKEN_ADDRESS).approve(
-			address(calculator),
-			type(uint256).max
-		);
+		if (
+			_TCO2Faucet == address(0) ||
+			_TCO2Token == address(0) ||
+			_EPNS_COMM_ADDRESS == address(0)
+		) {
+			CARBON_CALCULATOR_ADDRESS = address(0);
+		} else {
+			Calculator calculator = new Calculator(
+				_calculatorArgs[uint(calculatorArgs.router)]
+			);
+
+			CARBON_CALCULATOR_ADDRESS = address(calculator);
+		}
 	}
 
 	receive() external payable {}

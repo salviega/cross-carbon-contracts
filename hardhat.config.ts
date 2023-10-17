@@ -29,7 +29,7 @@ const SOLC_SETTINGS = {
 	// viaIR: true
 }
 
-const defaultNetwork = 'mumbai' // change the defaul network if you want to deploy onchain
+const defaultNetwork = 'optimismGoerli' // change the defaul network if you want to deploy onchain
 const config: CustomHardhatConfig = {
 	defaultNetwork,
 	networks: {
@@ -66,7 +66,7 @@ const config: CustomHardhatConfig = {
 			chainId: 11155111,
 			accounts: [PRIVATE_KEY || ''],
 			url: SEPORLIA_RPC_URL || '',
-			gas: 6000000, // Increase the gas limit
+			gas: 6000000000000, // Increase the gas limit
 			gasPrice: 10000000000 // Set a custom gas price (in Gwei, optional)
 		},
 		coverage: {

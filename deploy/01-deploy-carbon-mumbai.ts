@@ -37,7 +37,6 @@ const deployCarbon: DeployFunction = async function (
 		MUMBAI_TCO2FAUCET, // _TCO2Faucet
 		MUMBAI_TCO2TOKEN, // _TCO2Token
 		MUMBAI_EPNS_COMM_ADDRESS, // _EPNS_COMM_ADDRESS
-		MUMBAI_LINK_TOKEN, // _LINK_TOKEN_ADDRESS
 		certificateArgs, // _certificateArgs
 		calculatorArgs // _calculatorArgs
 	]

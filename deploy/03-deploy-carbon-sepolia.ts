@@ -37,7 +37,6 @@ const deployCarbon: DeployFunction = async function (
 		SEPOLIA_TCO2FAUCET, // _TCO2Faucet
 		SEPOLIA_TCO2TOKEN, // _TCO2Token
 		SEPOLIA_EPNS_COMM_ADDRESS, // _EPNS_COMM_ADDRESS
-		SEPOLIA_LINK_TOKEN, // _LINK_TOKEN_ADDRESS
 		certificateArgs, // _certificateArgs
 		calculatorArgs // _calculatorArgs
 	]
