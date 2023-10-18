@@ -8,7 +8,9 @@ import {
 	MUMBAI_TCO2FAUCET,
 	MUMBAI_TCO2TOKEN,
 	MUMBAI_EPNS_COMM_ADDRESS,
-	MUMBAI_FUNCTIONS_ROUTER
+	MUMBAI_FUNCTIONS_ROUTER,
+	MUMBAI_CCIP_ROUTER,
+	MUMBAI_LINK_TOKEN
 } from '../constants/constants'
 
 const deployCarbon: DeployFunction = async function (
@@ -23,6 +25,12 @@ const deployCarbon: DeployFunction = async function (
 	log('------------------- Mumbai -------------------------')
 	log('Deploying Carbon contract and waiting for confirmations...')
 
+	let carbonArgs: string[] = [
+		MUMBAI_TCO2FAUCET, // _TCO2Faucet,
+		MUMBAI_TCO2TOKEN, // _TCO2Token,
+		MUMBAI_EPNS_COMM_ADDRESS // _EPNS_COMM_ADDRESS
+	]
+
 	let certificateArgs: string[] = [
 		'Certificate', //_name
 		'CERT', // _symbol
@@ -33,12 +41,16 @@ const deployCarbon: DeployFunction = async function (
 		MUMBAI_FUNCTIONS_ROUTER // _router
 	]
 
+	let communicatorArgs: string[] = [
+		MUMBAI_CCIP_ROUTER, // router
+		MUMBAI_LINK_TOKEN
+	]
+
 	let args: any[] = [
-		MUMBAI_TCO2FAUCET, // _TCO2Faucet
-		MUMBAI_TCO2TOKEN, // _TCO2Token
-		MUMBAI_EPNS_COMM_ADDRESS, // _EPNS_COMM_ADDRESS
+		carbonArgs, // _carbonArgs
 		certificateArgs, // _certificateArgs
-		calculatorArgs // _calculatorArgs
+		calculatorArgs, // _calculatorArgs
+		communicatorArgs // _communicatorArgs
 	]
 
 	let CarbonContract: DeployResult = await deploy('Carbon', {
@@ -86,7 +98,7 @@ const deployCarbon: DeployFunction = async function (
 	)
 
 	log('----------------------------------------------------')
-	log('Setting up the certificate owner...')
+	log('Setting up the calculator owner...')
 
 	let transferCalculatorOwnershipTx =
 		await calculatorContract.transferOwnership(CarbonContract.address)
@@ -94,6 +106,22 @@ const deployCarbon: DeployFunction = async function (
 	await transferCalculatorOwnershipTx.wait(1)
 
 	log('Carbon contract is the new owner of the calculator contract.')
+	log('\n')
+
+	let communicatorContract: Contract = await ethers.getContractAt(
+		'Communicator',
+		deployer
+	)
+
+	log('----------------------------------------------------')
+	log('Setting up the communicator owner...')
+
+	let transferCommunicatorOwnershipTx =
+		await communicatorContract.transferOwnership(CarbonContract.address)
+
+	await transferCommunicatorOwnershipTx.wait(1)
+
+	log('Carbon contract is the new owner of the communicator contract.')
 	log('\n')
 }
 
