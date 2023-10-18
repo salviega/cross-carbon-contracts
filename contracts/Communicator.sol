@@ -41,7 +41,6 @@ contract Communicator is Ownable, CCIPReceiver {
 		});
 
 		IRouterClient(router).ccipSend(destinationChainSelector, message);
-		emit ReceivedMessage(abi.decode(message.data, (string)));
 	}
 
 	function _ccipReceive(
