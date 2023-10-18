@@ -36,9 +36,11 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 
 	uint256 public TCO2TokensInContract;
 	uint256 public carbonTokensMinted;
+	uint256 public carbonTokensBurned;
 
 	bool public isMumbai;
 
+	mapping(address => uint256) public carbonTokensBurnedPerUser;
 	mapping(bytes32 => Travel) public travelRequests;
 	mapping(bytes32 => Grocery) public groceryRequests;
 
@@ -258,6 +260,9 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			}
 
 			carbonTokensMinted -= _amount;
+			carbonTokensBurned += _amount;
+			carbonTokensBurnedPerUser[_buyer] += _amount;
+
 			burn(_amount);
 
 			uint256 certificateId = ICertficate(CARBON_CERTIFICATE_ADDRESS).safeMint(
@@ -333,6 +338,8 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			}
 
 			carbonTokensMinted -= _amount;
+			carbonTokensBurned += _amount;
+			carbonTokensBurnedPerUser[_buyer] += _amount;
 
 			emit RetiredCarbonCreditsCrosschain(_buyer, _amount, _network);
 			return;
@@ -455,7 +462,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	function transferCrosschain(
 		address to,
 		uint256 amount,
-		string memory messageContent, // {flag: 'transfer', buyer: 0x123, to:0xabc, amount: 1000, network: 'albitrum' || 'mumbai' || 'sepolia' || 'optimism'}
+		string memory messageContent, // {flag: 'transfer', from: 0x123, to:0xabc, amount: 1000, network: 'albitrum' || 'mumbai' || 'sepolia' || 'optimism'}
 		uint64 destinationChainSelector
 	) public {
 		ICommunicator(CARBON_COMMUNICATOR_ADDRESS).send(
@@ -518,7 +525,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address from,
 		address to,
 		uint256 amount,
-		string memory messageContent, // {flag: 'transferFrom', buyer: 0x123, to:0xabc, from:0x1b2, amount: 1000, network: 'albitrum' || 'mumbai' || 'sepolia' || 'optimism'}
+		string memory messageContent, // {flag: 'transferFrom', sender: 0x123, from:0x1b2, to:0xabc, amount: 1000, network: 'albitrum' || 'mumbai' || 'sepolia' || 'optimism'}
 		uint64 destinationChainSelector
 	) public {
 		ICommunicator(CARBON_COMMUNICATOR_ADDRESS).send(
