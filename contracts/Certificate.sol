@@ -24,6 +24,10 @@ contract Certificate is ERC721, Ownable {
 		return tokenId;
 	}
 
+	function changeBaseURI(string memory _baseURI) external onlyOwner {
+		baseURI = _baseURI;
+	}
+
 	function approve(address, uint256) public pure override {
 		revert("Approve isn't allowed");
 	}

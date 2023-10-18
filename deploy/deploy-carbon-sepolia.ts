@@ -35,7 +35,7 @@ const deployCarbon: DeployFunction = async function (
 	let certificateArgs: string[] = [
 		'Certificate', //_name
 		'CERT', // _symbol
-		'https://api.carbon.fyi/certificate/' // _baseURI
+		'' // _baseURI
 	]
 
 	let calculatorArgs: string[] = [
