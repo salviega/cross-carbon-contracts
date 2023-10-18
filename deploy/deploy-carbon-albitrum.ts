@@ -8,7 +8,9 @@ import {
 	ALBITRUM_TCO2FAUCET,
 	ALBITRUM_TCO2TOKEN,
 	ALBITRUM_EPNS_COMM_ADDRESS,
-	ALBITRUM_FUNCTIONS_ROUTER
+	ALBITRUM_FUNCTIONS_ROUTER,
+	ALBITRUM_CCIP_ROUTER,
+	ALBITRUM_LINK_TOKEN
 } from '../constants/constants'
 
 const deployCarbon: DeployFunction = async function (
@@ -20,25 +22,35 @@ const deployCarbon: DeployFunction = async function (
 	const { deployer } = await getNamedAccounts()
 
 	log('----------------------------------------------------')
-	log('------------------- Albitrum -----------------------')
+	log('------------------- ALBITRUM -------------------------')
 	log('Deploying Carbon contract and waiting for confirmations...')
 
-	let certificateArgs = [
+	let carbonArgs: string[] = [
+		ALBITRUM_TCO2FAUCET, // _TCO2Faucet,
+		ALBITRUM_TCO2TOKEN, // _TCO2Token,
+		ALBITRUM_EPNS_COMM_ADDRESS // _EPNS_COMM_ADDRESS
+	]
+
+	let certificateArgs: string[] = [
 		'Certificate', //_name
 		'CERT', // _symbol
 		'https://api.carbon.fyi/certificate/' // _baseURI
 	]
 
-	let calculatorArgs = [
+	let calculatorArgs: string[] = [
 		ALBITRUM_FUNCTIONS_ROUTER // _router
 	]
 
-	let args = [
-		ALBITRUM_TCO2FAUCET, // _TCO2Faucet
-		ALBITRUM_TCO2TOKEN, // _TCO2Token
-		ALBITRUM_EPNS_COMM_ADDRESS, // _EPNS_COMM_ADDRESS
+	let communicatorArgs: string[] = [
+		ALBITRUM_CCIP_ROUTER, // router
+		ALBITRUM_LINK_TOKEN
+	]
+
+	let args: any[] = [
+		carbonArgs, // _carbonArgs
 		certificateArgs, // _certificateArgs
-		calculatorArgs // _calculatorArgs
+		calculatorArgs, // _calculatorArgs
+		communicatorArgs // _communicatorArgs
 	]
 
 	let CarbonContract: DeployResult = await deploy('Carbon', {
@@ -52,14 +64,20 @@ const deployCarbon: DeployFunction = async function (
 
 	if (
 		!developmentChains.includes(network.name) &&
-		process.env.ALBITRUMSCAN_API_KEY
+		process.env.POLYGONSCAN_API_KEY
 	) {
 		await verify(CarbonContract.address, args)
 	}
 
+	let carbonContract: Contract = await ethers.getContractAt(
+		'Carbon',
+		CarbonContract.address
+	)
+
+	await verify(await carbonContract.CARBON_CALCULATOR_ADDRESS(), calculatorArgs)
+
 	log('----------------------------------------------------')
 	log('Setting up the certificate owner...')
-	log('\n')
 
 	let certificateContract: Contract = await ethers.getContractAt(
 		'Certificate',
@@ -72,6 +90,39 @@ const deployCarbon: DeployFunction = async function (
 	await transferCertificateOwnershipTx.wait(1)
 
 	log('Carbon contract is the new owner of the certificate contract.')
+	log('\n')
+
+	let calculatorContract: Contract = await ethers.getContractAt(
+		'Calculator',
+		deployer
+	)
+
+	log('----------------------------------------------------')
+	log('Setting up the calculator owner...')
+
+	let transferCalculatorOwnershipTx =
+		await calculatorContract.transferOwnership(CarbonContract.address)
+
+	await transferCalculatorOwnershipTx.wait(1)
+
+	log('Carbon contract is the new owner of the calculator contract.')
+	log('\n')
+
+	let communicatorContract: Contract = await ethers.getContractAt(
+		'Communicator',
+		deployer
+	)
+
+	log('----------------------------------------------------')
+	log('Setting up the communicator owner...')
+
+	let transferCommunicatorOwnershipTx =
+		await communicatorContract.transferOwnership(CarbonContract.address)
+
+	await transferCommunicatorOwnershipTx.wait(1)
+
+	log('Carbon contract is the new owner of the communicator contract.')
+	log('\n')
 }
 
 export default deployCarbon

@@ -31,7 +31,7 @@ const SOLC_SETTINGS = {
 	// viaIR: true
 }
 
-const defaultNetwork = 'optimismGoerli' // change the defaul network if you want to deploy onchain
+const defaultNetwork = 'hardhat' // change the defaul network if you want to deploy onchain
 const config: CustomHardhatConfig = {
 	defaultNetwork,
 	networks: {
