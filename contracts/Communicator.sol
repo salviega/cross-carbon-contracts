@@ -29,12 +29,12 @@ contract Communicator is Ownable, CCIPReceiver {
 
 	function send(
 		address receiver,
-		string memory message, // Renaming the parameter to avoid shadowing
+		string memory messageContent, // Renaming the parameter to avoid shadowing
 		uint64 destinationChainSelector
 	) external onlyOwner {
 		Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
 			receiver: abi.encode(receiver),
-			data: abi.encode(message),
+			data: abi.encode(messageContent),
 			tokenAmounts: new Client.EVMTokenAmount[](0),
 			extraArgs: '',
 			feeToken: link
