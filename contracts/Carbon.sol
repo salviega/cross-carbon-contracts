@@ -242,10 +242,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		revert('Only Mumbai network is supported');
 	}
 
-	function retireCarbonCredits(
-		address _buyer,
-		uint256 _amount
-	) public onlyOwner {
+	function retireCarbonCredits(address _buyer, uint256 _amount) public {
 		if (isMumbai) {
 			require(_amount > 0, 'Amount should be greater than 0');
 			require(_amount <= balanceOf(_buyer), 'Insufficient CARBON tokens');
@@ -349,7 +346,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		string[] calldata _args,
 		uint256[] calldata _returns,
 		address _buyer
-	) external onlyOwner {
+	) public {
 		if (equal(_flag, 'travel')) {
 			Travel memory travel = Travel(
 				_args[uint(travelArgs.distance)],
