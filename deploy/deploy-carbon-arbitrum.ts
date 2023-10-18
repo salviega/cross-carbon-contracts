@@ -5,12 +5,12 @@ import verify from '../helper-functions'
 import { ethers } from 'hardhat'
 import { Contract } from 'ethers'
 import {
-	ALBITRUM_TCO2FAUCET,
-	ALBITRUM_TCO2TOKEN,
-	ALBITRUM_EPNS_COMM_ADDRESS,
-	ALBITRUM_FUNCTIONS_ROUTER,
-	ALBITRUM_CCIP_ROUTER,
-	ALBITRUM_LINK_TOKEN
+	ARBITRUM_TCO2FAUCET,
+	ARBITRUM_TCO2TOKEN,
+	ARBITRUM_EPNS_COMM_ADDRESS,
+	ARBITRUM_FUNCTIONS_ROUTER,
+	ARBITRUM_CCIP_ROUTER,
+	ARBITRUM_LINK_TOKEN
 } from '../constants/constants'
 import IERC20ExtendedJson from '../artifacts/contracts/interfaces/IERC20Extended.sol/IERC20Extended.json'
 
@@ -27,9 +27,9 @@ const deployCarbon: DeployFunction = async function (
 	log('Deploying Carbon contract and waiting for confirmations...')
 
 	let carbonArgs: string[] = [
-		ALBITRUM_TCO2FAUCET, // _TCO2Faucet,
-		ALBITRUM_TCO2TOKEN, // _TCO2Token,
-		ALBITRUM_EPNS_COMM_ADDRESS // _EPNS_COMM_ADDRESS
+		ARBITRUM_TCO2FAUCET, // _TCO2Faucet,
+		ARBITRUM_TCO2TOKEN, // _TCO2Token,
+		ARBITRUM_EPNS_COMM_ADDRESS // _EPNS_COMM_ADDRESS
 	]
 
 	let certificateArgs: string[] = [
@@ -39,12 +39,12 @@ const deployCarbon: DeployFunction = async function (
 	]
 
 	let calculatorArgs: string[] = [
-		ALBITRUM_FUNCTIONS_ROUTER // _router
+		ARBITRUM_FUNCTIONS_ROUTER // _router
 	]
 
 	let communicatorArgs: string[] = [
-		ALBITRUM_CCIP_ROUTER, // router
-		ALBITRUM_LINK_TOKEN
+		ARBITRUM_CCIP_ROUTER, // router
+		ARBITRUM_LINK_TOKEN
 	]
 
 	let args: any[] = [
@@ -130,7 +130,7 @@ const deployCarbon: DeployFunction = async function (
 
 	const linkTokenContract: Contract = await ethers.getContractAt(
 		IERC20ExtendedJson.abi,
-		ALBITRUM_LINK_TOKEN
+		ARBITRUM_LINK_TOKEN
 	)
 
 	log('----------------------------------------------------')
@@ -138,9 +138,10 @@ const deployCarbon: DeployFunction = async function (
 	log('\n')
 
 	const transferLinkTx = await linkTokenContract.transfer(
-		communicatorContract.address,
+		await carbonContract.CARBON_COMMUNICATOR_ADDRESS(),
 		LINK_AMOUNT
 	)
+
 	await transferLinkTx.wait(1)
 
 	log('2 LINKs transferred to the Communicator contract.')
@@ -148,4 +149,4 @@ const deployCarbon: DeployFunction = async function (
 }
 
 export default deployCarbon
-deployCarbon.tags = ['all', 'albitrum']
+deployCarbon.tags = ['all', 'arbitrum']

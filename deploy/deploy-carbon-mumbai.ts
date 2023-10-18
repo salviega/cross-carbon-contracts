@@ -125,9 +125,6 @@ const deployCarbon: DeployFunction = async function (
 	log('Carbon contract is the new owner of the communicator contract.')
 	log('\n')
 
-	log('Carbon contract is the new owner of the communicator contract.')
-	log('\n')
-
 	const LINK_DECIMALS = 18
 	const LINK_AMOUNT = ethers.parseUnits('2', LINK_DECIMALS)
 
@@ -141,9 +138,10 @@ const deployCarbon: DeployFunction = async function (
 	log('\n')
 
 	const transferLinkTx = await linkTokenContract.transfer(
-		communicatorContract.address,
+		await carbonContract.CARBON_COMMUNICATOR_ADDRESS(),
 		LINK_AMOUNT
 	)
+
 	await transferLinkTx.wait(1)
 
 	log('2 LINKs transferred to the Communicator contract.')

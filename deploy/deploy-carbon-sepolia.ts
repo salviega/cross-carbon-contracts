@@ -141,9 +141,10 @@ const deployCarbon: DeployFunction = async function (
 	log('\n')
 
 	const transferLinkTx = await linkTokenContract.transfer(
-		communicatorContract.address,
+		await carbonContract.CARBON_COMMUNICATOR_ADDRESS(),
 		LINK_AMOUNT
 	)
+
 	await transferLinkTx.wait(1)
 
 	log('2 LINKs transferred to the Communicator contract.')

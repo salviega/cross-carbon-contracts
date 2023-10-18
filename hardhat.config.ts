@@ -12,8 +12,8 @@ import { CustomHardhatConfig } from './models/custom-hardhat-config.model'
 require('dotenv').config()
 
 const {
-	ALBITRUM_GOERLI_RPC_URL,
-	ALBITRUMSCAN_API_KEY,
+	ARBITRUM_GOERLI_RPC_URL,
+	ARBITRUMSCAN_API_KEY,
 	CELOSCAN_API_KEY,
 	OPTIMISMN_GOERLI_RPC_URL,
 	OPTIMISMNSCAN_API_KEY,
@@ -46,7 +46,7 @@ const config: CustomHardhatConfig = {
 		albitrumGoerli: {
 			chainId: 421613,
 			accounts: [PRIVATE_KEY || ''],
-			url: ALBITRUM_GOERLI_RPC_URL || '',
+			url: ARBITRUM_GOERLI_RPC_URL || '',
 			gas: 6000000, // Increase the gas limit
 			gasPrice: 10000000000 // Set a custom gas price (in Gwei, optional)
 		},
@@ -84,7 +84,7 @@ const config: CustomHardhatConfig = {
 	},
 	etherscan: {
 		apiKey: {
-			albitrumGoerli: ALBITRUMSCAN_API_KEY || '',
+			albitrumGoerli: ARBITRUMSCAN_API_KEY || '',
 			alfajores: CELOSCAN_API_KEY || '',
 			optimismnGoerli: OPTIMISMNSCAN_API_KEY || '',
 			polygonMumbai: POLYGONSCAN_API_KEY || '',
