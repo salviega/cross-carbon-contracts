@@ -52,14 +52,14 @@ const deployGateway: DeployFunction = async function (
 		GatewayContract.address
 	)
 
-	log('----------------------------------------------------')
-	log('Setting up whitelist to Albitrum chain...')
-	log('\n')
+	// log('----------------------------------------------------')
+	// log('Setting up whitelist to Albitrum chain...')
+	// log('\n')
 
-	let whitelistChainTx = await gatewayContract.whitelistChain(
-		ALBITRUM_CHAIN_SELECTOR
-	)
-	await whitelistChainTx.wait(1)
+	// let whitelistChainTx = await gatewayContract.whitelistChain(
+	// 	ALBITRUM_CHAIN_SELECTOR
+	// )
+	// await whitelistChainTx.wait(1)
 
 	// log('----------------------------------------------------')
 	// log('Setting up whitelist to Optimism chain...')
@@ -70,14 +70,14 @@ const deployGateway: DeployFunction = async function (
 	// )
 	// await whitelistChainTx.wait(1)
 
-	// log('----------------------------------------------------')
-	// log('Setting up whitelist to Sepolia chain...')
-	// log('\n')
+	log('----------------------------------------------------')
+	log('Setting up whitelist to Sepolia chain...')
+	log('\n')
 
-	// whitelistChainTx = await gatewayContract.whitelistChain(
-	// 	SEPOLIA_CHAIN_SELECTOR
-	// )
-	// await whitelistChainTx.wait(1)
+	let whitelistChainTx = await gatewayContract.whitelistChain(
+		SEPOLIA_CHAIN_SELECTOR
+	)
+	await whitelistChainTx.wait(1)
 
 	const LINK_DECIMALS = 18
 	const LINK_AMOUNT = ethers.parseUnits('2', LINK_DECIMALS)

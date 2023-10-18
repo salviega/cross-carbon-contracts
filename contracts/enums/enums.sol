@@ -5,10 +5,21 @@ enum calculatorArgs {
 	router
 }
 
+enum carbonArgs {
+	_TCO2Faucet,
+	_TCO2Token,
+	_EPNS_COMM_ADDRESS
+}
+
 enum certificateArgs {
 	name,
 	symbol,
 	baseURI
+}
+
+enum communicatorArgs {
+	router,
+	link
 }
 
 enum groceryArgs {
