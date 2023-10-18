@@ -12,6 +12,7 @@ import {
 	ALBITRUM_CCIP_ROUTER,
 	ALBITRUM_LINK_TOKEN
 } from '../constants/constants'
+import IERC20ExtendedJson from '../artifacts/contracts/interfaces/IERC20Extended.sol/IERC20Extended.json'
 
 const deployCarbon: DeployFunction = async function (
 	hre: HardhatRuntimeEnvironment
@@ -122,6 +123,27 @@ const deployCarbon: DeployFunction = async function (
 	await transferCommunicatorOwnershipTx.wait(1)
 
 	log('Carbon contract is the new owner of the communicator contract.')
+	log('\n')
+
+	const LINK_DECIMALS = 18
+	const LINK_AMOUNT = ethers.parseUnits('2', LINK_DECIMALS)
+
+	const linkTokenContract: Contract = await ethers.getContractAt(
+		IERC20ExtendedJson.abi,
+		ALBITRUM_LINK_TOKEN
+	)
+
+	log('----------------------------------------------------')
+	log('Transferring 2 LINKs to the Communicator contract...')
+	log('\n')
+
+	const transferLinkTx = await linkTokenContract.transfer(
+		communicatorContract.address,
+		LINK_AMOUNT
+	)
+	await transferLinkTx.wait(1)
+
+	log('2 LINKs transferred to the Communicator contract.')
 	log('\n')
 }
 
