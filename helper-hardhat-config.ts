@@ -12,7 +12,7 @@ export const networkConfig: networkConfigInfo = {
 	localhost: {
 		blockConfirmations: 3
 	},
-	albitrumGoerli: {
+	arbitrumGoerli: {
 		blockConfirmations: 3
 	},
 	alfajores: {

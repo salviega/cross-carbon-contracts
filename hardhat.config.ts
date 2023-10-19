@@ -43,7 +43,7 @@ const config: CustomHardhatConfig = {
 			chainId: 1337,
 			allowUnlimitedContractSize: true
 		},
-		albitrumGoerli: {
+		arbitrumGoerli: {
 			chainId: 421613,
 			accounts: [PRIVATE_KEY || ''],
 			url: ARBITRUM_GOERLI_RPC_URL || '',
@@ -84,7 +84,7 @@ const config: CustomHardhatConfig = {
 	},
 	etherscan: {
 		apiKey: {
-			albitrumGoerli: ARBITRUMSCAN_API_KEY || '',
+			arbitrumGoerli: ARBITRUMSCAN_API_KEY || '',
 			alfajores: CELOSCAN_API_KEY || '',
 			optimismnGoerli: OPTIMISMNSCAN_API_KEY || '',
 			polygonMumbai: POLYGONSCAN_API_KEY || '',
