@@ -9,6 +9,7 @@ import '@openzeppelin/contracts/utils/Strings.sol';
 import './Calculator.sol';
 import './Certificate.sol';
 import './Communicator.sol';
+import './Receiver.sol';
 
 import './enums/enums.sol';
 import './interfaces/ILinkToken.sol';
@@ -33,6 +34,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	address public CARBON_CERTIFICATE_ADDRESS;
 	address public CARBON_CALCULATOR_ADDRESS;
 	address public CARBON_COMMUNICATOR_ADDRESS;
+	address public CARBON_RECEIVER_ADDRESS;
 
 	uint256 public TCO2TokensInContract;
 	uint256 public carbonTokensMinted;
@@ -157,7 +159,13 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			_communicatorArgs[uint(communicatorArgs.link)]
 		);
 
+		Receiver receiver = new Receiver(
+			_communicatorArgs[uint(communicatorArgs.router)],
+			_communicatorArgs[uint(communicatorArgs.link)]
+		);
+
 		CARBON_COMMUNICATOR_ADDRESS = address(communicator);
+		CARBON_RECEIVER_ADDRESS = address(receiver);
 	}
 
 	function buyCarbonCredits(address _buyer, uint256 _amount) public {

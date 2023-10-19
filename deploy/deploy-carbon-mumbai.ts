@@ -88,6 +88,8 @@ const deployCarbon: DeployFunction = async function (
 		communicatorArgs
 	)
 
+	await verify(await carbonContract.CARBON_RECEIVER_ADDRESS(), communicatorArgs)
+
 	log('----------------------------------------------------')
 	log('Setting up the certificate owner...')
 
