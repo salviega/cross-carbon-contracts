@@ -75,7 +75,15 @@ const deployCarbon: DeployFunction = async function (
 		CarbonContract.address
 	)
 
-	await verify(await carbonContract.CARBON_CALCULATOR_ADDRESS(), calculatorArgs)
+	await verify(
+		await carbonContract.CARBON_CERTIFICATE_ADDRESS(),
+		certificateArgs
+	)
+
+	await verify(
+		await carbonContract.CARBON_COMMUNICATOR_ADDRESS(),
+		communicatorArgs
+	)
 
 	log('----------------------------------------------------')
 	log('Setting up the certificate owner...')
@@ -93,22 +101,6 @@ const deployCarbon: DeployFunction = async function (
 	log('Carbon contract is the new owner of the certificate contract.')
 	log('\n')
 
-	let calculatorContract: Contract = await ethers.getContractAt(
-		'Calculator',
-		deployer
-	)
-
-	log('----------------------------------------------------')
-	log('Setting up the calculator owner...')
-
-	let transferCalculatorOwnershipTx =
-		await calculatorContract.transferOwnership(CarbonContract.address)
-
-	await transferCalculatorOwnershipTx.wait(1)
-
-	log('Carbon contract is the new owner of the calculator contract.')
-	log('\n')
-
 	let communicatorContract: Contract = await ethers.getContractAt(
 		'Communicator',
 		deployer
@@ -121,9 +113,6 @@ const deployCarbon: DeployFunction = async function (
 		await communicatorContract.transferOwnership(CarbonContract.address)
 
 	await transferCommunicatorOwnershipTx.wait(1)
-
-	log('Carbon contract is the new owner of the communicator contract.')
-	log('\n')
 
 	log('Carbon contract is the new owner of the communicator contract.')
 	log('\n')

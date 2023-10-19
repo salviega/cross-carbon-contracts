@@ -204,6 +204,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	function buyCarbonCreditsCrosschain(
 		address _buyer,
 		uint256 _amount,
+		address _receiver,
 		string memory messageContent, // {flag: 'buy', buyer: 0x123, amount: 1000, network: 'albitrum' || 'mumbai' || 'sepolia' || 'optimism'}
 		uint64 _destinationChainSelector
 	) public {
@@ -211,7 +212,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			require(_amount > 0, 'Amount should be greater than 0');
 
 			ICommunicator(CARBON_COMMUNICATOR_ADDRESS).send(
-				_buyer,
+				_receiver,
 				messageContent,
 				_destinationChainSelector
 			);
@@ -305,6 +306,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address _buyer,
 		uint256 _amount,
 		string memory _tokenURI,
+		address _receiver,
 		string memory messageContent, // {flag: 'retire', buyer: 0x123, amount: 1000, network: 'albitrum' || 'mumbai' || 'sepolia' || 'optimism'}
 		uint64 _destinationChainSelector
 	) public {
@@ -313,7 +315,7 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 			require(_amount <= balanceOf(_buyer), 'Insufficient CARBON tokens');
 
 			ICommunicator(CARBON_COMMUNICATOR_ADDRESS).send(
-				_buyer,
+				_receiver,
 				messageContent,
 				_destinationChainSelector
 			);
@@ -471,11 +473,12 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 	function transferCrosschain(
 		address to,
 		uint256 amount,
+		address _receiver,
 		string memory messageContent, // {flag: 'transfer', from: 0x123, to:0xabc, amount: 1000, network: 'albitrum' || 'mumbai' || 'sepolia' || 'optimism'}
 		uint64 destinationChainSelector
 	) public {
 		ICommunicator(CARBON_COMMUNICATOR_ADDRESS).send(
-			to,
+			_receiver,
 			messageContent,
 			destinationChainSelector
 		);
@@ -534,11 +537,12 @@ contract Carbon is ERC20, ERC20Burnable, Ownable, Helpers {
 		address from,
 		address to,
 		uint256 amount,
+		address _receiver,
 		string memory messageContent, // {flag: 'transferFrom', sender: 0x123, from:0x1b2, to:0xabc, amount: 1000, network: 'albitrum' || 'mumbai' || 'sepolia' || 'optimism'}
 		uint64 destinationChainSelector
 	) public {
 		ICommunicator(CARBON_COMMUNICATOR_ADDRESS).send(
-			to,
+			_receiver,
 			messageContent,
 			destinationChainSelector
 		);

@@ -13,6 +13,7 @@ import {
 	MUMBAI_LINK_TOKEN
 } from '../constants/constants'
 import IERC20ExtendedJson from '../artifacts/contracts/interfaces/IERC20Extended.sol/IERC20Extended.json'
+import { CONNREFUSED } from 'dns'
 
 const deployCarbon: DeployFunction = async function (
 	hre: HardhatRuntimeEnvironment
@@ -75,7 +76,17 @@ const deployCarbon: DeployFunction = async function (
 		CarbonContract.address
 	)
 
+	await verify(
+		await carbonContract.CARBON_CERTIFICATE_ADDRESS(),
+		certificateArgs
+	)
+
 	await verify(await carbonContract.CARBON_CALCULATOR_ADDRESS(), calculatorArgs)
+
+	await verify(
+		await carbonContract.CARBON_COMMUNICATOR_ADDRESS(),
+		communicatorArgs
+	)
 
 	log('----------------------------------------------------')
 	log('Setting up the certificate owner...')
